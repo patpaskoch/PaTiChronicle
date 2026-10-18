@@ -1,0 +1,22 @@
+-- PaTiCompetition strings, English (source and fallback). One key per line: L.KEY = "Text".
+local _, ns = ...
+ns.Locales = ns.Locales or {}
+local L = ns.Locales.enUS or {}
+ns.Locales.enUS = L
+
+L.YES = "yes"
+L.NO = "no"
+L.HELP = "/pcomp probe (test results), /pcomp reset (start the test again), /pcomp version"
+L.VERSION = "version %s"
+L.PROBE_HEADER = "Test results — client %s"
+L.PROBE_EVENTS = "Combat log: %s (CombatLogGetCurrentEventInfo: %s) · secret check: %s"
+L.PROBE_BOSS_EVENTS = "Boss events: start %s · end %s · kill %s"
+L.PROBE_LOG = "Combat log entries: %d, counted: %d, secret (unreadable): %d"
+L.PROBE_RUN = "Run in %s since %s"
+L.PROBE_PLAYER = "%s: damage %d · taken %d · healing %d · deaths %d"
+L.PROBE_FIGHT = "%s: %s (#%s) success %s at %s in %s"
+L.PROBE_DEATHS = "Enemy deaths saved: %d (last: %s)"
+L.PROBE_SAVED = "Saved with /reload or logout (SavedVariables PaTiCompetition.lua)."
+L.PROBE_RESET = "Test results cleared."
+L.PROBE_RUN_STARTED = "Clock started: %s"
+L.PROBE_ENCOUNTER = "Boss fight over: %s (#%s) at %s"

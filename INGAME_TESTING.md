@@ -1,0 +1,38 @@
+# Ingame Testing – PaTiCompetition
+
+World of Warcraft: Forever
+Interface: 16001
+
+Diese Datei dokumentiert ausschließlich Tests im echten WoW-Client.
+
+Automatisierte Tests, CI und Code Review zählen NICHT als Ingame-Verifikation.
+Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github.com/patpaskoch/PaTiAdmin/blob/main/docs/TESTING.md#in-game-test-files).
+
+## Legende
+
+- [ ] offen / noch nicht bestätigt
+- [x] vom Owner im echten Client bestätigt
+- ❌ FAIL = im echten Client fehlgeschlagen
+- 🔧 FIX IMPLEMENTED = Codefix vorhanden, Retest noch offen
+- ✅ VERIFIED = erfolgreich im echten Client bestätigt
+- MANUAL RETEST REQUIRED = erneuter Test notwendig
+
+## Installation / Laden
+
+- [ ] PT-COMP-001 Login ohne Lua-Fehler; PaTiCompetition erscheint in der AddOn-Liste mit Beschreibung
+- [ ] PT-COMP-002 `/reload` ohne Lua-Fehler; `/pcomp` zeigt die Hilfe, `/pcomp version` die Version 0.1.0
+
+## Testlauf (Probe)
+
+- [ ] PT-COMP-010 `/pcomp probe` direkt nach dem Login: Zeilen „Kampflog“ und „Boss-Meldungen“ mit ja/nein
+  erscheinen (Ausgabe melden oder nach `/reload` die SavedVariables-Datei schicken)
+- [ ] PT-COMP-011 Draußen ein paar Gegner töten, dann `/pcomp probe`: „Kampflog-Einträge“ steigt, dein Name steht mit
+  Schaden und erlittenem Schaden da; Zahlen ungefähr plausibel (Ausgabe melden, auch die Zahl „geheim“)
+- [ ] PT-COMP-012 In einer Gruppe mit Heiler: Heiler steht mit Heilung da, Gruppenmitglieder mit ihrem Schaden;
+  Begleiter (Pet) zählt für seinen Besitzer
+- [ ] PT-COMP-013 Im Dungeon: beim ersten Kampf erscheint „Uhr gestartet: <Dungeon> (<Nummer>)“
+- [ ] PT-COMP-014 Im Dungeon einen Boss töten: erscheint „Bosskampf vorbei: <Name> (#<Nummer>) bei <Zeit>“? Wenn nicht:
+  melden (dann sendet der Client keine Boss-Meldung)
+- [ ] PT-COMP-015 Nach dem Dungeon `/pcomp probe`: Liste der Bosskämpfe und „Gespeicherte Gegner-Tode“ mit dem letzten
+  Gegner und Nummer (Ausgabe melden; daraus entsteht die Endboss-Liste)
+- [ ] PT-COMP-016 `/pcomp reset`: „Testergebnis gelöscht.“, danach zeigt `/pcomp probe` wieder 0 Einträge

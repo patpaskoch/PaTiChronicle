@@ -1,0 +1,13 @@
+## Interface: 16001
+## Title: PaTiCompetition
+## Notes: Dungeon competition: run clock, end screen and score (0.1.0: test run)
+## Notes-deDE: Dungeon-Wettkampf: Laufzeit, Endbildschirm und Score (0.1.0: Testlauf)
+## Author: PaTi
+## Version: 0.1.0
+## SavedVariablesPerCharacter: PaTiCompetitionDB
+
+Shared\Shared.xml
+Locales\enUS.lua
+Locales\deDE.lua
+Logic.lua
+PaTiCompetition.lua
