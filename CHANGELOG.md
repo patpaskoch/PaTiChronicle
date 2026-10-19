@@ -10,6 +10,29 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
   `PaTiCompetitionDB` file is copied over once by hand, see README). In-game tests start again as PT-CHRON-…; the
   old PT-COMP-… are retired.
 
+### Added
+- Run report "Every run tells a story" (owner decision 2026-10-19) instead of player cards and a score: three tabs —
+  Overview (dungeon, run time, new best time, the group without numbers per person, group achievements, your
+  highlight, the run as a strip), My performance (your achievements and your development against your own average
+  in this dungeon and role), Timeline (fights, boss fights, deaths, aggro moments with time and fight number).
+- Run rules: start with the first fight in a 5-player dungeon; continues through deaths, ghost run-backs, /reload;
+  completed by your click or the learned end boss; aborted by click, another dungeon, 15 min outside or 30 min
+  logged out; counted with at least 3 players. Best times per dungeon and per group, the last 20 runs per dungeon.
+- Achievements only for reliable data: New best time, First time set, Survived together, No wipe, Well-rehearsed
+  team, Steadfast, Improved, Aggro under control (tank), Untouched (healer), Clean aggro (damage). Missing data:
+  "not checkable" with the reason.
+- Run clock line in dungeons (right click: end run, abort, report, hide). Settings: my role, show the run clock, open
+  the report at the end. Commands `end`, `abort`, `hud`.
+- Probe: boss events, threat and death state readable or secret, fights, the function names of `C_DamageMeter`.
+
+### Removed
+- The end screen with five player cards, seven values, points per value and the score 0–100 (`Score.lua`,
+  `Results.lua`); the combat-log parser.
+
+### Known Issues
+- Not tested in game. Boss events, readable threat and death states are unconfirmed (probe, PT-CHRON-010…016);
+  achievements that need them stay "not checkable" until then. No icon yet.
+
 Earlier, as PaTiCompetition 0.1.0 (never released):
 
 ### Added

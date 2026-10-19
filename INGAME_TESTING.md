@@ -26,6 +26,61 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   AddOn-Liste mit Beschreibung („Jeder Run erzählt eine Geschichte …“); der alte Ordner `PaTiCompetition` ist weg
 - [ ] PT-CHRON-002 `/reload` ohne Lua-Fehler; `/pchron` und `/patichronicle` antworten, `/pchron version` zeigt 0.2.0
 - [ ] PT-CHRON-003 Der alte Befehl `/pcomp` funktioniert noch genauso wie `/pchron`
+- [ ] PT-CHRON-004 Übernommene Daten: Farbschema, Größe und Sprache wie vorher bei PaTiCompetition
+
+## API-Prüfung (Probe, Tests T1–T7)
+
+- [ ] PT-CHRON-010 (T6) `/pchron probe`: Zeile „C_DamageMeter: …“ zeigt Funktionsnamen – Ausgabe melden
+- [ ] PT-CHRON-011 (T2) In einem 5er-Dungeon einen Boss töten, dann `/pchron probe`: erscheinen Zeilen
+  „ENCOUNTER_START / ENCOUNTER_END: <Name> (#<Nummer>) Erfolg …“? Ausgabe melden
+- [ ] PT-CHRON-012 (T1) Nach Kämpfen in einer Gruppe `/pchron probe`: „Bedrohungsstatus: lesbar … · geheim … · von
+  Gruppenmitgliedern …“ – Zahlen melden
+- [ ] PT-CHRON-013 (T3) Nach einem Tod in der Gruppe `/pchron probe`: „Todeszustand: lesbar … · geheim …“ – melden
+- [ ] PT-CHRON-014 (T4) „Kämpfe in Dungeons gesehen“ steigt mit jedem Kampf im Dungeon
+- [ ] PT-CHRON-015 (T5) Die Run-Uhr zeigt den richtigen Dungeon-Namen
+- [ ] PT-CHRON-016 (T7) Ohne Rollenwahl: Reiter „Meine Leistung“ zeigt deine Rolle (oder „Keine Rolle“);
+  Einstellung „Meine Rolle“ ändert sie für den nächsten Run
+
+## Run
+
+- [ ] PT-CHRON-020 Dungeon betreten: Uhr-Zeile „<Dungeon> bereit …“; erster Kampf: Chat „Run gestartet“, Uhr läuft
+- [ ] PT-CHRON-021 Sterben und als Geist zurücklaufen: Run läuft weiter; im Verlauf steht der Tod; „Lückenlos: ja“
+- [ ] PT-CHRON-022 `/reload` im Run: Run läuft weiter, im Verlauf unten „Lückenlos: nein“
+- [ ] PT-CHRON-023 Nach dem Endboss ••• oder Rechtsklick auf die Uhr → „Run beenden – Endboss besiegt“: Chat „Run
+  abgeschlossen“, Bericht öffnet sich; wenn Boss-Meldungen kommen: Chat „Endboss … gemerkt“
+- [ ] PT-CHRON-024 Nächster Run im selben Dungeon: beim Endboss endet der Run von selbst
+- [ ] PT-CHRON-025 „Run abbrechen“: Chat „Run abgebrochen … wird nicht gespeichert“, die Bestzeit bleibt
+- [ ] PT-CHRON-026 Während eines Runs einen anderen Dungeon betreten: der alte Run wird abgebrochen
+
+## Run-Bericht
+
+- [ ] PT-CHRON-030 `/pchron test`: Übersicht „Die Todesminen“, „abgeschlossen in 24:13“, „NEUE BESTZEIT · 0:48
+  schneller“, fünf Porträts (Initialen), Namen in Klassenfarbe mit „21 Krieger“ usw.; GEMEINSAM: Neue Bestzeit,
+  Eingespieltes Team, Kein Wipe; DEIN HIGHLIGHT: Standhaft (5 Runs in Folge), Saubere Aggro; Streifen; TEST-Abzeichen
+- [ ] PT-CHRON-031 Symbole sichtbar (kein grünes Fragezeichen): Erfolge, Totenkopf/Kreuz/Dreieck im Streifen
+- [ ] PT-CHRON-032 Tooltips: Erfolg → Regel; Markierung im Streifen → Zeit und Ereignis; „! n nicht prüfbar“ → Gründe
+- [ ] PT-CHRON-033 Reiter „Meine Leistung“: Kael · Schaden · 20 Magier; Erfolge; Entwicklung (Laufzeit, Tode,
+  Aggro-Momente) mit Schnitt, kleinen Balken und „besser als dein Schnitt“ in Grün
+- [ ] PT-CHRON-034 Reiter „Verlauf“: Streifen, Legende, „16 Kämpfe · 3 Bosskämpfe · im Kampf …“, Liste mit Bossen,
+  Toden, „Aggro-Moment (Gruppe)“ und „Run abgeschlossen“; nichts überlappt oder ist abgeschnitten
+- [ ] PT-CHRON-035 Farbschemata Standard, WoForever und Dracula: alles lesbar, Reiter-Unterstrich in Akzentfarbe
+- [ ] PT-CHRON-036 Nach einem echten Run: Bericht mit echten Porträts und deinen Werten; niemand hat Punkte oder Rang
+- [ ] PT-CHRON-037 Esc schließt den Bericht; am Kopf verschiebbar; Position bleibt nach `/reload`
+
+## Run-Uhr
+
+- [ ] PT-CHRON-040 Nur in 5er-Dungeons sichtbar; Zeit läuft jede Sekunde; Bestzeit rechts daneben
+- [ ] PT-CHRON-041 Ziehen verschiebt sie, Position bleibt nach `/reload`; Rechtsklick-Menü; „Run-Uhr ausblenden“,
+  Einstellung „Run-Uhr im Dungeon zeigen“ und `/pchron hud` schalten sie aus und an
+
+## Einstellungen und Befehle
+
+- [ ] PT-CHRON-050 Einstellungen: Sprache, Größe, Meine Rolle, Run-Uhr, Bericht am Ende öffnen, Fenster sperren,
+  Farbschema, Deckkraft, Testmodus-Schalter; „Standard wiederherstellen“ behält Runs und Bestzeiten
+- [ ] PT-CHRON-051 Sprache Englisch: Texte im Bericht wechseln sofort
+- [ ] PT-CHRON-052 `/pchron` blendet den Bericht ein/aus; `show`, `hide`, `reset`; `end`/`abort` ohne Run → „Es
+  läuft kein Run.“; `version` → 0.2.0; `/pchron xyz` → Hilfe
+
 
 ## Legacy – frühere PaTiCompetition-Tests (RETIRED)
 

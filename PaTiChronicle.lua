@@ -1,21 +1,23 @@
--- PaTiChronicle 0.1.0: the probe. Before the dungeon competition (run clock, end screen with damage, damage taken,
--- healing and a score) is built, this finds out what the WoW Forever client really delivers: a source for the
--- numbers (the combat log is reserved for the Blizzard UI here) and the boss fight events.
--- Display only: nothing is cast, targeted or sent.
--- Results stay in PaTiChronicleDB.probe (SavedVariables) and are shown with /pchron probe.
+-- PaTiChronicle — Every run tells a story. A chronicle of your dungeon runs: run clock, run report (overview, my
+-- performance, timeline), best times, run history and achievements for teamplay, survival and personal bests.
+-- We play together against our own earlier runs, not against each other. Display only: nothing is cast, targeted
+-- or sent. This file: API adapters, events, runs. Rules: Run.lua, Chronicle.lua; UI: Report*.lua, Hud.lua;
+-- settings and commands: Settings.lua.
 local addonName, ns = ...
-local UI, L, Logic, Score, Results = ns.UI, ns.UI.L, ns.Logic, ns.Score, ns.Results
+local UI, L, Logic, Run, Chronicle = ns.UI, ns.UI.L, ns.Logic, ns.Run, ns.Chronicle
+local Report, Hud, Sample = ns.Report, ns.Hud, ns.Sample
 
 local DB
-local window = Results.window -- the end screen (Results.lua)
-local memberUnits = {} -- { [unit] = name }: player and party (whose threat status is watched)
-local threatStatus = {} -- { [unit] = last UnitThreatSituation }, runtime only
+local window = Report.window
+local memberUnits = {} -- { [unit] = name }: player and party1-4
+local testMode = false -- runtime only: the report shows the example run
 
 local function say(key, ...)
     print("|cff68caffPaTiChronicle:|r " .. L[key]:format(...))
 end
 
 local function isSecret(value) return issecretvalue ~= nil and issecretvalue(value) == true end
+local function readable(value) if not isSecret(value) then return value end end
 local function flag(value) return not isSecret(value) and (value == true or value == 1) end
 
 local function addonVersion()
@@ -25,74 +27,289 @@ end
 
 -- API adapters ---------------------------------------------------------------------------------------------------
 
--- "Deadmines (36)" or nil outside an instance. GetInstanceInfo: name, type, …, 8th = instance ID.
+-- A 5-player dungeon: { key, name }, else nil. GetInstanceInfo: name, type, …, 8th = instance ID.
 local function currentInstance()
     if not (IsInInstance and flag(IsInInstance())) or not GetInstanceInfo then return nil end
-    local name, _, _, _, _, _, _, id = GetInstanceInfo()
-    if isSecret(name) or isSecret(id) then return nil end
-    return ("%s (%s)"):format(tostring(name), tostring(id))
-end
-
-local function addMember(unit)
-    if not UnitExists or not flag(UnitExists(unit)) or not UnitName then return end
-    local name = UnitName(unit)
-    if name and not isSecret(name) then memberUnits[unit] = name end
+    local name, instanceType, _, _, _, _, _, id = GetInstanceInfo()
+    name, instanceType, id = readable(name), readable(instanceType), readable(id)
+    if instanceType ~= "party" or type(name) ~= "string" then return nil end
+    return { key = tostring(id or name), name = name }
 end
 
 local function readMembers()
     memberUnits = {}
-    addMember("player")
-    for index = 1, 4 do addMember("party" .. index) end
+    for _, unit in ipairs({ "player", "party1", "party2", "party3", "party4" }) do
+        if UnitExists and flag(UnitExists(unit)) and UnitName then
+            local name = readable(UnitName(unit))
+            if type(name) == "string" then memberUnits[unit] = name end
+        end
+    end
+end
+
+local function myRole()
+    if DB.myRole ~= "AUTO" then return DB.myRole end
+    local role = UnitGroupRolesAssigned and readable(UnitGroupRolesAssigned("player"))
+    if role == "TANK" or role == "HEALER" or role == "DAMAGER" then return role end
+    return "NONE"
+end
+
+local function roleOf(unit)
+    if unit == "player" then return myRole() end
+    local role = UnitGroupRolesAssigned and readable(UnitGroupRolesAssigned(unit))
+    if role == "TANK" or role == "HEALER" or role == "DAMAGER" then return role end
+    return "NONE"
+end
+
+local function memberInfo(unit, name)
+    local info = { name = name, role = roleOf(unit) }
+    local level = UnitLevel and readable(UnitLevel(unit))
+    if type(level) == "number" and level > 0 then info.level = level end
+    if UnitClass then
+        local className, classFile = UnitClass(unit)
+        info.className = type(readable(className)) == "string" and className or nil
+        info.classFile = type(readable(classFile)) == "string" and classFile or nil
+    end
+    return info
+end
+
+-- The tank: you (your role setting) or the member with the TANK role. nil = nobody known.
+local function tankName()
+    for unit, name in pairs(memberUnits) do
+        if roleOf(unit) == "TANK" then return name end
+    end
+end
+
+local function groupNames()
+    local names = {}
+    for _, name in pairs(memberUnits) do names[#names + 1] = name end
+    table.sort(names)
+    return names
+end
+
+local function noteMembers(run)
+    for unit, name in pairs(memberUnits) do Run.AddMember(run, memberInfo(unit, name)) end
+    run.tank = tankName() or run.tank
+end
+
+-- Runs -----------------------------------------------------------------------------------------------------------
+
+local refresh -- defined below (HUD)
+
+-- The order on the report: tank, healer, damage, then names; only members still in the group.
+local ROLE_ORDER = { TANK = 1, HEALER = 2, DAMAGER = 3 }
+local function lineup(run, names)
+    local list = {}
+    for _, name in ipairs(names) do list[#list + 1] = name end
+    table.sort(list, function(a, b)
+        local ra = ROLE_ORDER[(run.members[a] or {}).role] or 4
+        local rb = ROLE_ORDER[(run.members[b] or {}).role] or 4
+        if ra ~= rb then return ra < rb end
+        return a < b
+    end)
+    return list
+end
+
+local function units()
+    local map = {}
+    for unit, name in pairs(memberUnits) do map[name] = unit end
+    return map
+end
+
+local function runNumber(key, role)
+    local count = 0
+    for _, entry in ipairs(DB.runs[key] or {}) do
+        if entry.role == role then count = count + 1 end
+    end
+    return count
+end
+
+local function showReport(report, tab)
+    report.units = units()
+    Report.Show(report, tab)
+end
+
+-- how: "auto" (the learned end boss) or "manual" (your click).
+local function finishRun(how)
+    local run = DB.run
+    if not run then return end
+    local now = time()
+    noteMembers(run)
+    if how == "manual" and Chronicle.LearnEndBoss(DB, run, now) then say("END_BOSS_LEARNED", run.name) end
+    Run.Finish(run, now, how, GetTime())
+    local names = groupNames()
+    local result = Chronicle.Evaluate(DB, run, #names, names)
+    Chronicle.Store(DB, run, result.summary)
+    DB.run = nil
+    DB.report = { run = run, result = result, size = #names, names = lineup(run, names),
+        best = Chronicle.BestTime(DB, run.key), runNumber = runNumber(run.key, run.myRole) }
+    say("RUN_COMPLETED", run.name, Logic.Clock(result.summary.time))
+    if DB.openReport then testMode = false; showReport(DB.report, "overview") end
+    refresh()
+end
+
+-- Aborted runs are not saved in the history and give no achievements; their timeline stays viewable.
+local function abortRun(reason)
+    local run = DB.run
+    if not run then return end
+    Run.Abort(run, time(), reason)
+    local names = groupNames()
+    local result = Chronicle.Evaluate(DB, run, #names, names)
+    result.group, result.mine, result.missing = {}, {}, {}
+    DB.run = nil
+    DB.report = { run = run, result = result, size = #names, names = lineup(run, names),
+        best = Chronicle.BestTime(DB, run.key), runNumber = runNumber(run.key, run.myRole) + 1 }
+    say("RUN_ABORTED", run.name, L["ABORT_" .. reason:upper()] or reason)
+    refresh()
+end
+
+-- The running run as a report (achievements only at the end).
+local function liveReport()
+    local run = DB.run
+    run.now = time()
+    local names = groupNames()
+    local result = Chronicle.Evaluate(DB, run, #names, names)
+    result.group, result.mine, result.missing = {}, {}, {}
+    return { run = run, result = result, size = #names, names = lineup(run, names),
+        best = Chronicle.BestTime(DB, run.key), runNumber = runNumber(run.key, run.myRole) + 1 }
+end
+
+local function currentReport()
+    if testMode then
+        local sample = Sample.Report(L.SAMPLE_DUNGEON)
+        sample.runNumber, sample.best = 5, 1453
+        return sample
+    end
+    if DB.run then return liveReport() end
+    return DB.report
+end
+
+local function setShown(shown) -- no secure frames: fine in combat
+    if not shown then window:Hide(); return true end
+    local report = currentReport()
+    if not report then say("NO_REPORT"); return false end
+    showReport(report)
+    return true
+end
+
+-- The HUD line: inside a 5-player dungeon (and switched on), with the running or the last run of this dungeon.
+refresh = function()
+    local instance = DB and DB.showHud and currentInstance()
+    if not instance then Hud.Update(nil); return end
+    local run = DB.run
+    local last = DB.report and DB.report.run
+    if not run and last and last.key == instance.key and last.state == "completed" then run = last end
+    Hud.Update({ name = instance.name, run = run, best = Chronicle.BestTime(DB, instance.key), menu = function()
+        local items = {}
+        if DB.run then
+            items[#items + 1] = { text = "END_RUN", onClick = function() finishRun("manual") end }
+            items[#items + 1] = { text = "ABORT_RUN", onClick = function() abortRun("click") end }
+        end
+        items[#items + 1] = { text = "OPEN_REPORT", onClick = function() setShown(true) end }
+        items[#items + 1] = { text = "HIDE_HUD", onClick = function() DB.showHud = false; refresh() end }
+        return items
+    end })
 end
 
 -- Events ---------------------------------------------------------------------------------------------------------
 
--- Events that may not exist in this client: RegisterEvent raises an error for unknown names, so each is tried once.
--- Never COMBAT_LOG_EVENT_UNFILTERED: this client reserves it for the Blizzard UI; registering it shows the
--- "blocked" popup (ADDON_ACTION_FORBIDDEN, owner 2026-10-19), which pcall does not prevent.
+-- Optional events: RegisterEvent raises an error for unknown names, so each is tried once. Never
+-- COMBAT_LOG_EVENT_UNFILTERED: this client reserves it for the Blizzard UI (forbidden popup, 2026-10-19).
 local OPTIONAL = { "ENCOUNTER_START", "ENCOUNTER_END", "BOSS_KILL", "UNIT_THREAT_SITUATION_UPDATE" }
 local registered = {}
 local events = CreateFrame("Frame")
-for _, event in ipairs({ "PLAYER_LOGIN", "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE",
-    "PLAYER_REGEN_DISABLED" }) do
+for _, event in ipairs({ "PLAYER_LOGIN", "PLAYER_LOGOUT", "PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA",
+    "GROUP_ROSTER_UPDATE", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "UNIT_HEALTH", "PLAYER_DEAD",
+    "PLAYER_UNGHOST", "PLAYER_ALIVE" }) do
     events:RegisterEvent(event)
 end
 for _, event in ipairs(OPTIONAL) do registered[event] = pcall(events.RegisterEvent, events, event) end
 
--- UnitThreatSituation(unit) without an enemy: the highest status against any enemy (nil out of combat).
+-- What this client offers (the probe, /pchron probe).
+local function noteClient(probe)
+    for _, name in ipairs(OPTIONAL) do probe.events[name] = registered[name] == true end
+    probe.events.C_DamageMeter = C_DamageMeter ~= nil
+    probe.damageMeter = nil
+    if type(C_DamageMeter) == "table" then
+        local names = {}
+        for key in pairs(C_DamageMeter) do names[#names + 1] = tostring(key) end
+        table.sort(names)
+        probe.damageMeter = table.concat(names, ", ") -- only the function names; nothing is called (test T6)
+    end
+    probe.client = GetBuildInfo and ("%s / %s"):format(tostring((GetBuildInfo())), tostring(select(4, GetBuildInfo())))
+        or "?"
+end
+
+local function deathCheck(unit)
+    local run, name = DB.run, memberUnits[unit]
+    if not run or not name or not UnitIsDeadOrGhost then return end
+    local dead = UnitIsDeadOrGhost(unit)
+    Logic.RecordRead(DB.probe, "deaths", isSecret(dead))
+    if isSecret(dead) then Run.DeathState(run, name, nil, false, time()); return end
+    local allDead = true
+    for other in pairs(memberUnits) do
+        local value = UnitIsDeadOrGhost(other)
+        if isSecret(value) or not value then allDead = false end
+    end
+    Run.DeathState(run, name, dead and true or false, allDead, time())
+end
+
 local function onThreat(unit)
-    local name = unit and memberUnits[unit]
-    if not name or not UnitThreatSituation then return end
+    local run, name = DB.run, unit and memberUnits[unit]
+    if not run or not name or not UnitThreatSituation then return end
     local ok, status = pcall(UnitThreatSituation, unit)
-    if not ok or isSecret(status) then return end
-    local role = UnitGroupRolesAssigned and UnitGroupRolesAssigned(unit)
-    if isSecret(role) then role = nil end
-    Logic.RecordThreat(DB.probe, name, role, threatStatus[unit], status)
-    threatStatus[unit] = status
+    if not ok then return end
+    Logic.RecordRead(DB.probe, "threat", isSecret(status), unit ~= "player")
+    if isSecret(status) then Run.Threat(run, name, nil, false, false, GetTime(), time()); return end
+    local tank, mine = run.tank, unit == "player"
+    -- Without a known tank the others' moments cannot be told apart from tanking: only yours count then.
+    if not tank and not mine then return end
+    Run.Threat(run, name, type(status) == "number" and status or 0, name == tank, mine, GetTime(), time())
 end
 
 local function onEncounter(event, id, name, ...)
-    -- ENCOUNTER_END: id, name, difficulty, group size, success. ENCOUNTER_START / BOSS_KILL: no success.
+    id, name = readable(id), readable(name)
     local success
-    if event == "ENCOUNTER_END" then success = (select(3, ...)) end
-    if isSecret(id) then id = nil end
-    if isSecret(name) then name = nil end
-    if isSecret(success) then success = nil end
-    Logic.RecordEncounter(DB.probe, event, id, name, success, currentInstance(), GetTime())
-    if event == "ENCOUNTER_END" or event == "BOSS_KILL" then
-        say("PROBE_ENCOUNTER", tostring(name), tostring(id), Logic.Clock(Logic.RunTime(DB.probe, GetTime())))
-    end
+    if event == "ENCOUNTER_END" then success = flag((select(3, ...))) end
+    if event == "BOSS_KILL" then success = true end
+    local instance = currentInstance()
+    Logic.RecordEncounter(DB.probe, event, id, name, success, instance and instance.name)
+    local run = DB.run
+    if not run then return end
+    if event == "ENCOUNTER_START" then Run.BossStart(run); return end
+    if event == "BOSS_KILL" and registered.ENCOUNTER_END then return end -- the same kill, already counted
+    Run.BossEnd(run, time(), name, success, id)
+    if success and id and DB.endBosses[run.key] == id then finishRun("auto") end
 end
 
--- What this client offers, written into the probe at login and after a reset.
-local function noteClient(probe)
-    for _, name in ipairs(OPTIONAL) do probe.events[name] = registered[name] == true end
-    probe.events.CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo ~= nil
-    -- Blizzard's own damage meter data (Retail 12.0) as a possible source: only whether it exists, nothing is called.
-    probe.events.C_DamageMeter = C_DamageMeter ~= nil
-    probe.events.issecretvalue = issecretvalue ~= nil
-    probe.client = GetBuildInfo and ("%s / %s"):format(tostring((GetBuildInfo())), tostring(select(4, GetBuildInfo())))
-        or "?"
+-- Zone changes: back in the run's dungeon, left it (as a ghost or not), or another dungeon.
+local function onLocation()
+    local run, instance, now = DB.run, currentInstance(), time()
+    if run then
+        if instance then
+            local resumed, reason = Run.Resume(run, instance, now)
+            if not resumed and reason then abortRun(reason) end
+        elseif not Run.StillWaiting(run, now) then
+            abortRun("left")
+        elseif not run.leftAt then
+            Run.Leave(run, now, UnitIsGhost and flag(UnitIsGhost("player")))
+        end
+    end
+    refresh()
+end
+
+local function onFightStart()
+    local instance = currentInstance()
+    if not instance then return end
+    local now = time()
+    if not DB.run then
+        DB.run = Run.New(instance, now, { name = memberUnits.player or "?", role = myRole() })
+        say("RUN_STARTED", instance.name)
+    end
+    DB.probe.fights = DB.probe.fights + 1
+    noteMembers(DB.run)
+    Run.FightStart(DB.run, now)
+    for unit in pairs(memberUnits) do deathCheck(unit) end
+    refresh()
 end
 
 events:SetScript("OnEvent", function(_, event, ...)
@@ -100,198 +317,49 @@ events:SetScript("OnEvent", function(_, event, ...)
         PaTiChronicleDB = Logic.Migrate(PaTiChronicleDB)
         DB = PaTiChronicleDB
         UI.SetLanguage(DB.language)
-        window:Attach(DB, 0, 80)
+        window:Attach(DB, 0, 60)
         window:SetScale(DB.scale)
+        Hud.Attach(DB)
         noteClient(DB.probe)
         readMembers()
+        if DB.run and not Run.Login(DB.run, time()) then abortRun("logout") end
         return
     end
     if not DB then return end
-    if event == "ENCOUNTER_START" or event == "ENCOUNTER_END" or event == "BOSS_KILL" then
-        onEncounter(event, ...)
+    if event == "UNIT_HEALTH" then
+        local unit = ...
+        if memberUnits[unit] then deathCheck(unit) end
+    elseif event == "PLAYER_DEAD" or event == "PLAYER_UNGHOST" or event == "PLAYER_ALIVE" then
+        deathCheck("player")
     elseif event == "UNIT_THREAT_SITUATION_UPDATE" then
         onThreat(...)
+    elseif event == "ENCOUNTER_START" or event == "ENCOUNTER_END" or event == "BOSS_KILL" then
+        onEncounter(event, ...)
     elseif event == "PLAYER_REGEN_DISABLED" then
-        local instance = currentInstance()
-        if instance and Logic.StartRun(DB.probe, instance, GetTime()) then say("PROBE_RUN_STARTED", instance) end
-    else
+        onFightStart()
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        if DB.run then Run.FightEnd(DB.run, time(), GetTime()) end
+    elseif event == "PLAYER_LOGOUT" then
+        if DB.run then Run.Logout(DB.run, time()) end
+    elseif event == "GROUP_ROSTER_UPDATE" then
         readMembers()
+        if DB.run then noteMembers(DB.run) end
+    else -- PLAYER_ENTERING_WORLD, ZONE_CHANGED_NEW_AREA
+        readMembers()
+        onLocation()
     end
 end)
 
--- End screen ----------------------------------------------------------------------------------------------------
-
-local testMode = false -- runtime only: the end screen shows the example values (TEST badge)
-
-local function unitOf(name)
-    for unit, memberName in pairs(memberUnits) do
-        if memberName == name then return unit end
-    end
-end
-
--- What the client tells about a member still in the group: role, level, class (a secret value is left out).
-local function readUnit(row)
-    row.unit = unitOf(row.name)
-    local unit = row.unit
-    if not unit then return end
-    local role = UnitGroupRolesAssigned and UnitGroupRolesAssigned(unit)
-    if role and not isSecret(role) then row.role = role end
-    local level = UnitLevel and UnitLevel(unit)
-    if type(level) == "number" and not isSecret(level) and level > 0 then row.level = level end
-    if UnitClass then
-        local className, classFile = UnitClass(unit)
-        if type(className) == "string" and not isSecret(className) then row.className = className end
-        if type(classFile) == "string" and not isSecret(classFile) then row.classFile = classFile end
-    end
-end
-
--- The current run (or, without a run, everything since the last clear); in test mode the example values.
-local function showResults()
-    local sample = testMode
-    local rows = sample and Score.Sample() or Logic.Ranking(DB.probe)
-    if not sample then
-        for _, row in ipairs(rows) do readUnit(row) end
-    end
-    local limits = Score.Apply(rows)
-    Score.Order(rows)
-    local best = Score.Best(rows)
-    local run = DB.probe.run
-    local subtitle = L.RESULTS_SUBTITLE
-    if sample then subtitle = L.RESULTS_SUBTITLE_RUN:format(L.SAMPLE_DUNGEON, "24:13")
-    elseif run then
-        subtitle = L.RESULTS_SUBTITLE_RUN:format(run.instance, Logic.Clock(Logic.RunTime(DB.probe, GetTime())))
-    end
-    Results.Show(rows, best, { subtitle = subtitle, sample = sample, limits = limits })
-end
-
-local function setShown(shown) -- no secure frames: fine in combat
-    if shown then showResults() else window:Hide() end
-    return true
-end
-
--- Test mode on: the end screen opens with the example values; off: back to the real ones.
-local function toggleTestMode()
-    testMode = not testMode
-    showResults()
-end
-
--- Settings -------------------------------------------------------------------------------------------------------
-
-local modal
-
-local function buildSettings()
-    modal = UI.CreateModal("PaTiChronicleSettings", function() return "PaTiChronicle " .. L.SETTINGS end, 380)
-    local scales = {}
-    for _, scale in ipairs(Logic.SCALES) do
-        scales[#scales + 1] = { value = scale, text = function() return ("%d %%"):format(scale * 100 + 0.5) end }
-    end
-    modal:AddSection("GENERAL")
-    modal:AddRow("LANGUAGE", UI.CreateLanguageDropdown(modal, DB, 170))
-    modal:AddRow("SCALE", UI.CreateDropdown(modal, 170, {
-        items = function() return scales end,
-        get = function() return DB.scale end,
-        set = function(scale) DB.scale = scale; window:SetScale(scale) end,
-    }))
-    modal:AddControls(UI.CreateCheckbox(modal, "LOCK_WINDOW", {
-        get = function() return window:IsLocked() end,
-        set = function(locked) window:SetLocked(locked) end,
-    }))
-    UI.AddWindowSettings(modal, window) -- test switch, theme, panel opacity (PaTiShared)
-    modal:Finish(function()
-        Logic.RestoreDefaults(DB)
-        window:ApplyTheme()
-        window:ApplyOpacity()
-        UI.SetLanguage(DB.language)
-        window:SetLocked(DB.locked)
-        window:SetScale(DB.scale)
-    end)
-end
-
-local function openSettings()
-    if not modal then buildSettings() end
-    modal:Show()
-end
-
-window:SetMenu(function()
-    if not DB then return {} end
-    return {
-        { text = "SETTINGS", onClick = openSettings },
-        { text = window:IsLocked() and "UNLOCK" or "LOCK",
-            onClick = function() window:SetLocked(not window:IsLocked()) end },
-        { text = "TEST_MODE", checked = testMode, onClick = toggleTestMode },
-        { text = "HIDE", onClick = function() setShown(false) end },
-    }
-end)
--- PaTiSuite "show": the end screen with the current values (an empty window would say nothing).
-window.suiteSetShown = function(shown)
-    if not DB then return false end
-    return setShown(shown)
-end
-
--- Names, roles and numbers are set by showResults: repaint them in the new language.
-UI.OnLanguageChanged(function()
-    if DB and window:IsShown() then showResults() end
-end)
-
--- Commands -------------------------------------------------------------------------------------------------------
-
-local function yesNo(value) return value and L.YES or L.NO end
-
-local function printProbe()
-    local probe = DB.probe
-    say("PROBE_HEADER", tostring(probe.client))
-    local seen = probe.events
-    say("PROBE_EVENTS", yesNo(seen.C_DamageMeter), yesNo(seen.CombatLogGetCurrentEventInfo),
-        yesNo(seen.issecretvalue))
-    say("PROBE_BOSS_EVENTS", yesNo(seen.ENCOUNTER_START), yesNo(seen.ENCOUNTER_END), yesNo(seen.BOSS_KILL))
-    local log = probe.combatLog
-    say("PROBE_LOG", log.total, log.counted, log.secret)
-    if probe.run then
-        say("PROBE_RUN", probe.run.instance, Logic.Clock(Logic.RunTime(probe, GetTime())))
-    end
-    for _, row in ipairs(Logic.Ranking(probe)) do
-        say("PROBE_PLAYER", row.name, tostring(row.role or "-"), row.done, row.taken, row.heal, row.interrupts,
-            row.kills, row.deaths, row.aggro)
-    end
-    for _, fight in ipairs(probe.encounters) do
-        say("PROBE_FIGHT", fight.event, tostring(fight.name), tostring(fight.id), tostring(fight.success),
-            Logic.Clock(fight.at), tostring(fight.instance))
-    end
-    local last = probe.deaths[#probe.deaths]
-    say("PROBE_DEATHS", #probe.deaths, last and ("%s #%s"):format(tostring(last.name), tostring(last.id)) or "-")
-    say("PROBE_SAVED")
-end
-
-local function clearProbe()
-    DB.probe = Logic.NewProbe()
-    noteClient(DB.probe)
-    say("PROBE_RESET")
-end
-
-local function resetPosition()
-    DB.point, DB.relativePoint, DB.x, DB.y = nil, nil, nil, nil
-    window:Attach(DB, 0, 80)
-end
-
--- The same words as the other PaTi addons (reset = window position); clear = forget the test results.
-local COMMANDS = {
-    [""] = function() setShown(not window:IsShown()) end,
-    show = function() setShown(true) end,
-    hide = function() setShown(false) end,
-    test = toggleTestMode,
-    lock = function() window:SetLocked(true) end,
-    unlock = function() window:SetLocked(false) end,
-    reset = resetPosition,
-    settings = openSettings,
-    probe = printProbe,
-    clear = clearProbe,
-    version = function() say("VERSION", addonVersion()) end,
+ns.Commands = { -- for Settings.lua
+    say = say, setShown = setShown, refresh = refresh, finishRun = finishRun, abortRun = abortRun,
+    toggleTest = function()
+        testMode = not testMode
+        if testMode or window:IsShown() then setShown(true) end
+        if not testMode and not currentReport() then window:Hide() end
+    end,
+    isTest = function() return testMode end,
+    db = function() return DB end,
+    noteClient = noteClient,
+    version = addonVersion,
 }
-
-SLASH_PATICHRONICLE1 = "/patichronicle"
-SLASH_PATICHRONICLE2 = "/pchron"
-SLASH_PATICHRONICLE3 = "/pcomp" -- old name (PaTiCompetition), kept until 0.3.0
-SlashCmdList.PATICHRONICLE = function(message)
-    local command = COMMANDS[(message or ""):match("^%s*(.-)%s*$"):lower()]
-    if command and DB then command() else say("HELP") end
-end
+UI.OnLanguageChanged(Report.Refresh)

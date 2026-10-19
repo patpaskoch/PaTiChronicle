@@ -10,6 +10,12 @@ Shared\Shared.xml
 Locales\enUS.lua
 Locales\deDE.lua
 Logic.lua
-Score.lua
-Results.lua
+Run.lua
+Chronicle.lua
+Sample.lua
+Report.lua
+ReportMine.lua
+ReportTimeline.lua
+Hud.lua
 PaTiChronicle.lua
+Settings.lua
