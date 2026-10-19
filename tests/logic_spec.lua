@@ -50,10 +50,14 @@ describe("Logic.Record", function()
         record(entry("UNIT_DIED", nil, HEALER))
         record(entry("SPELL_DAMAGE", ME, MOB, 1, "x", 1, SECRET, 0))
         record(entry("SPELL_CAST_START", ME, MOB))
-        assert.same({ done = 100, taken = 40, heal = 0, deaths = 0, aggro = 0 }, probe.players.Pati)
-        assert.same({ done = 0, taken = 0, heal = 40, deaths = 1, aggro = 0 }, probe.players.Heali)
+        record(entry("SPELL_INTERRUPT", ME, MOB, 1766, "Kick", 1, 133, "Fireball", 4))
+        record(entry("PARTY_KILL", ME, MOB))
+        assert.same({ done = 100, taken = 40, heal = 0, deaths = 0, aggro = 0, interrupts = 1, kills = 1 },
+            probe.players.Pati)
+        assert.same({ done = 0, taken = 0, heal = 40, deaths = 1, aggro = 0, interrupts = 0, kills = 0 },
+            probe.players.Heali)
         assert.same({ { id = 639, name = "Edwin" } }, probe.deaths)
-        assert.same({ 7, 5, 1 }, { probe.combatLog.total, probe.combatLog.counted, probe.combatLog.secret })
+        assert.same({ 9, 7, 1 }, { probe.combatLog.total, probe.combatLog.counted, probe.combatLog.secret })
     end)
 
     it("keeps only the last MAX_DEATHS enemy deaths", function()
@@ -112,8 +116,10 @@ describe("run clock", function()
         assert.is_false(Logic.StartRun(probe, "Deadmines (36)", 200))
         Logic.RecordEncounter(probe, "ENCOUNTER_END", 1279, "Edwin", 1, "Deadmines (36)", 854)
         assert.same({ 754, "12:34" }, { probe.encounters[1].at, Logic.Clock(probe.encounters[1].at) })
+        probe.players.Pati = { done = 5, taken = 0, heal = 0, deaths = 0 }
         assert.is_true(Logic.StartRun(probe, "Wailing Caverns (43)", 900))
         assert.equal(900, probe.run.start)
+        assert.is_nil(next(probe.players)) -- a new run starts the totals from zero
     end)
 
     it("formats hours and missing times", function()

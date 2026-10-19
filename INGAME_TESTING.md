@@ -39,3 +39,18 @@ Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github
 - [ ] PT-COMP-017 In der Gruppe: zieht ein Nicht-Tank Aggro (ein Gegner haut ihn), steht bei `/pcomp probe` hinter
   seinem Namen „Aggro gezogen 1“ (oder mehr) und seine Rolle; beim Tank zählt es auch
   (gibt später aber keine Minuspunkte)
+
+## Endbildschirm „Party Competition“
+
+- [ ] PT-COMP-020 `/pcomp test`: Fenster mit Titel „Party Competition“, „RUNDENAUSWERTUNG · Todesminen · 24:13“,
+  „Beispielwerte“ und TEST-Abzeichen; fünf Karten nebeneinander: Arden (Tank), Mira (Heiler), dann Nyra, Kael, Korr
+- [ ] PT-COMP-021 Karten: Rahmen ums Bild in Rollenfarbe (Tank blau, Heiler grün, Schaden rot), Name in derselben Farbe,
+  sieben Werte mit Symbol (Schaden, Heilung, Erlittener Schaden, Unterbrechungen, Todesstöße, Aggro gezogen, Tode),
+  nichts abgeschnitten oder überlappt; Symbole sichtbar (kein grünes Fragezeichen)
+- [ ] PT-COMP-022 Beste Wertung hat einen goldenen Rahmen und goldene Zahl; Zahlen deutsch „18,4 Tsd.“
+- [ ] PT-COMP-023 Esc schließt das Fenster; ••• → Ausblenden schließt es; am Kopf verschiebbar, Position bleibt nach
+  `/reload`
+- [ ] PT-COMP-024 Nach echten Kämpfen `/pcomp show`: deine Gruppe mit echten Porträts und Werten; Wertung wirkt fair
+  (Rückmeldung zur Formel)
+- [ ] PT-COMP-025 Unterbrechungen und Todesstöße werden gezählt (z. B. Tritt / Zuschlagen; letzter Treffer auf einen
+  Gegner): Werte auf der Karte und bei `/pcomp probe`

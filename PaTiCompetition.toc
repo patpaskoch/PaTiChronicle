@@ -10,4 +10,6 @@ Shared\Shared.xml
 Locales\enUS.lua
 Locales\deDE.lua
 Logic.lua
+Score.lua
+Results.lua
 PaTiCompetition.lua

@@ -3,9 +3,10 @@
 -- numbers in combat (secret or readable) and the boss fight events. Display only: nothing is cast, targeted or sent.
 -- Results stay in PaTiCompetitionDB.probe (SavedVariables) and are shown with /pcomp probe.
 local addonName, ns = ...
-local UI, L, Logic = ns.UI, ns.UI.L, ns.Logic
+local UI, L, Logic, Score, Results = ns.UI, ns.UI.L, ns.Logic, ns.Score, ns.Results
 
 local DB
+local window = Results.window -- the end screen (Results.lua)
 local members = {} -- { [guid] = name }: player, party and their pets (a pet counts for its owner)
 local memberUnits = {} -- { [unit] = name }: player and party (whose threat status is watched)
 local threatStatus = {} -- { [unit] = last UnitThreatSituation }, runtime only
@@ -106,6 +107,7 @@ events:SetScript("OnEvent", function(_, event, ...)
         PaTiCompetitionDB = Logic.Migrate(PaTiCompetitionDB)
         DB = PaTiCompetitionDB
         UI.SetLanguage("auto")
+        window:Attach(DB, 0, 80)
         noteClient(DB.probe)
         readMembers()
         return
@@ -125,6 +127,50 @@ events:SetScript("OnEvent", function(_, event, ...)
     end
 end)
 
+-- End screen ----------------------------------------------------------------------------------------------------
+
+local function unitOf(name)
+    for unit, memberName in pairs(memberUnits) do
+        if memberName == name then return unit end
+    end
+end
+
+-- The current run (or, without a run, everything since the last reset). sample: the example values.
+local function showResults(sample)
+    local rows = sample and Score.Sample() or Logic.Ranking(DB.probe)
+    if not sample then
+        for _, row in ipairs(rows) do
+            row.unit = unitOf(row.name)
+            local role = row.unit and UnitGroupRolesAssigned and UnitGroupRolesAssigned(row.unit)
+            if role and not isSecret(role) then row.role = role end
+        end
+    end
+    Score.Apply(rows)
+    Score.Order(rows)
+    local best = Score.Best(rows)
+    local run = DB.probe.run
+    local subtitle = L.RESULTS_SUBTITLE
+    if sample then subtitle = L.RESULTS_SUBTITLE_RUN:format(L.SAMPLE_DUNGEON, "24:13")
+    elseif run then
+        subtitle = L.RESULTS_SUBTITLE_RUN:format(run.instance, Logic.Clock(Logic.RunTime(DB.probe, GetTime())))
+    end
+    Results.Show(rows, best, { subtitle = subtitle, sample = sample })
+end
+
+window:SetMenu(function()
+    if not DB then return {} end
+    return {
+        { text = window:IsLocked() and "UNLOCK" or "LOCK",
+            onClick = function() window:SetLocked(not window:IsLocked()) end },
+        { text = "HIDE", onClick = function() window:Hide() end },
+    }
+end)
+-- PaTiSuite "show": the end screen with the current values (an empty window would say nothing).
+window.suiteSetShown = function(shown)
+    if not DB then return false end
+    if shown then showResults(false) else window:Hide() end
+end
+
 -- Commands -------------------------------------------------------------------------------------------------------
 
 local function yesNo(value) return value and L.YES or L.NO end
@@ -142,7 +188,8 @@ local function printProbe()
         say("PROBE_RUN", probe.run.instance, Logic.Clock(Logic.RunTime(probe, GetTime())))
     end
     for _, row in ipairs(Logic.Ranking(probe)) do
-        say("PROBE_PLAYER", row.name, tostring(row.role or "-"), row.done, row.taken, row.heal, row.deaths, row.aggro)
+        say("PROBE_PLAYER", row.name, tostring(row.role or "-"), row.done, row.taken, row.heal, row.interrupts,
+            row.kills, row.deaths, row.aggro)
     end
     for _, fight in ipairs(probe.encounters) do
         say("PROBE_FIGHT", fight.event, tostring(fight.name), tostring(fight.id), tostring(fight.success),
@@ -159,10 +206,12 @@ SlashCmdList.PATICOMPETITION = function(message)
     local command = (message or ""):lower():match("^%s*(%S*)")
     if not DB then return end
     if command == "probe" then printProbe()
+    elseif command == "show" then showResults(false)
+    elseif command == "test" then showResults(true)
     elseif command == "reset" then
         DB.probe = Logic.NewProbe()
         noteClient(DB.probe)
         say("PROBE_RESET")
     elseif command == "version" then say("VERSION", addonVersion())
-    else say("HELP") end
+    else say("HELP"); say("HELP_MORE") end
 end

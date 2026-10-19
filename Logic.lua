@@ -22,6 +22,8 @@ local KINDS = {
     DAMAGE_SHIELD = { kind = "damage", amount = 15, over = 16 },
     SPELL_HEAL = { kind = "heal", amount = 15, over = 16 },
     SPELL_PERIODIC_HEAL = { kind = "heal", amount = 15, over = 16 },
+    SPELL_INTERRUPT = { kind = "interrupt" },
+    PARTY_KILL = { kind = "kill" }, -- killing blow: source = who struck it, dest = the victim
     UNIT_DIED = { kind = "death" },
 }
 
@@ -73,7 +75,7 @@ end
 local function player(probe, name)
     local entry = probe.players[name]
     if not entry then
-        entry = { done = 0, taken = 0, heal = 0, deaths = 0, aggro = 0 }
+        entry = { done = 0, taken = 0, heal = 0, deaths = 0, aggro = 0, interrupts = 0, kills = 0 }
         probe.players[name] = entry
     end
     return entry
@@ -93,6 +95,10 @@ function Logic.Record(probe, entry, members)
         if to then local p = player(probe, to); p.taken = p.taken + entry.amount end
     elseif entry.kind == "heal" and entry.amount then
         if from then local p = player(probe, from); p.heal = p.heal + entry.amount end
+    elseif entry.kind == "interrupt" then
+        if from then local p = player(probe, from); p.interrupts = (p.interrupts or 0) + 1 end
+    elseif entry.kind == "kill" then
+        if from and not to then local p = player(probe, from); p.kills = (p.kills or 0) + 1 end
     elseif entry.kind == "death" then
         if to then
             local p = player(probe, to); p.deaths = p.deaths + 1
@@ -111,12 +117,13 @@ function Logic.RecordThreat(probe, name, role, previous, status)
     if status >= 2 and (type(previous) ~= "number" or previous < 2) then entry.aggro = (entry.aggro or 0) + 1 end
 end
 
--- event: "ENCOUNTER_START" | "ENCOUNTER_END" | "BOSS_KILL"; success only for ENCOUNTER_END (1/true = killed).
 -- The run clock: starts with the first fight inside an instance, restarts in another instance. now = GetTime().
+-- A new run starts the members' totals from zero (the end screen shows one run).
 function Logic.StartRun(probe, instance, now)
     local run = probe.run
     if run and run.instance == instance then return false end
     probe.run = { instance = instance, start = now }
+    probe.players = {}
     return true
 end
 
@@ -125,6 +132,7 @@ function Logic.RunTime(probe, now)
     return probe.run and now - probe.run.start or nil
 end
 
+-- event: "ENCOUNTER_START" | "ENCOUNTER_END" | "BOSS_KILL"; success only for ENCOUNTER_END (1/true = killed).
 function Logic.RecordEncounter(probe, event, id, name, success, instance, now)
     push(probe.encounters, { event = event, id = id, name = name, success = success, instance = instance,
         at = Logic.RunTime(probe, now) },
@@ -145,7 +153,8 @@ function Logic.Ranking(probe)
     local list = {}
     for name, entry in pairs(probe.players) do
         list[#list + 1] = { name = name, done = entry.done, taken = entry.taken, heal = entry.heal,
-            deaths = entry.deaths, aggro = entry.aggro or 0, role = entry.role }
+            deaths = entry.deaths, aggro = entry.aggro or 0, interrupts = entry.interrupts or 0,
+            kills = entry.kills or 0, role = entry.role }
     end
     table.sort(list, function(a, b)
         if a.done ~= b.done then return a.done > b.done end
@@ -154,10 +163,12 @@ function Logic.Ranking(probe)
     return list
 end
 
--- SavedVariables: { schema, probe }. Unknown or broken values are replaced; a saved probe is kept.
+-- SavedVariables: { schema, probe, theme, window position }. Unknown or broken values are replaced;
+-- a saved probe is kept.
 function Logic.Migrate(db)
     if type(db) ~= "table" then db = {} end
     if type(db.probe) ~= "table" or type(db.probe.combatLog) ~= "table" then db.probe = Logic.NewProbe() end
+    if db.theme == nil then db.theme = "woforever" end -- gold and bronze, like the owner's end screen design
     db.schema = Logic.SCHEMA
     return db
 end
