@@ -18,8 +18,9 @@ the group, then your part, then the details:
   colour, class and role), achievements as medallions and two highlights of the run.
 - **Group result** — the five members side by side as portraits
   and a table in fixed order (tank, healer, damage — never sorted by values): deaths, time dead, attacks of 3 s or
-  more, time in the group, the group total. A click shows the times. A second tab, **Contribution**, shows damage, healing,
-  interrupts and dispels from WoW's own damage meter (read after every fight, never reset). Missing values show "n/a" with the reason — never 0.
+  more, time in the group, the group total. A click shows the times. A second tab,
+  **Contribution**, shows damage, healing, interrupts and dispels from WoW's own damage meter (read after every fight,
+  never reset). Missing values show "n/a" with the reason — never 0.
 - **My performance** — what you can be proud of (your achievements), your development against your own average in
   this dungeon and role (in words: "2:29 faster than your average", "your best run here") and where there is room.
 - **Timeline** — the run on a time axis (fights, boss fights, deaths, aggro moments), the list of what happened and
