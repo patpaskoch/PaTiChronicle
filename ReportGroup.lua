@@ -1,5 +1,5 @@
--- PaTiChronicle run report, tab "Group result" (owner 2026-10-19): the five members side by side — larger, a 3D
--- character when the client allows it (probe T9), else the portrait — and below a calm result table with all of
+-- PaTiChronicle run report, tab "Group result" (owner 2026-10-19): the five members side by side as portraits
+-- (owner 2026-10-19: no 3D characters, the portrait is steadier) — and below a calm result table with all of
 -- them. Fixed order (tank, healer, damage), never sorted by values, no highlighted maximum, no winner. Values come
 -- from Chronicle.PlayerRows; a missing value shows "n/a" with its reason, never 0. "Contribution" (damage,
 -- healing, interrupts) stays switched off until C_DamageMeter is confirmed.
@@ -9,7 +9,7 @@ local UI, L, Logic, Chronicle, Report = ns.UI, ns.UI.L, ns.Logic, ns.Chronicle, 
 local page = Report.pages.group
 local width = Report.CONTENT_WIDTH
 local SLOT = width / 5
-local FIGURE_W, FIGURE_H = 70, 80
+local FIGURE_H = 80 -- the portrait area above the name
 local FIGURES_TOP = -30
 local TABLE_TOP = -196
 local ROW = 28 -- a little tighter than Report.ROW: five members, the total and the detail line fit the page
@@ -33,7 +33,6 @@ for index = 1, 5 do
     slot:SetPoint("TOPLEFT", (index - 1) * SLOT, FIGURES_TOP)
     slot.portrait = Report.Portrait(slot, 64)
     slot.portrait.ring:SetPoint("TOP", 0, -(FIGURE_H - 68) / 2)
-    -- The 3D character, only where the probe confirmed PlayerModel:SetUnit (created lazily, see setFigure).
     slot.name = Report.Text(slot, "Heading")
     slot.name:SetPoint("TOP", 0, -FIGURE_H - 8)
     slot.name:SetWidth(SLOT - 8)
@@ -49,24 +48,6 @@ for index = 1, 5 do
     slot.mark:SetPoint("TOP", slot.role, "BOTTOM", 0, -6)
     UI.Paint(slot.mark, "SetColorTexture", "Accent")
     slots[index] = slot
-end
-
--- A 3D character for a member in the group; false when the client cannot show one (then the portrait stays).
-local function setFigure(slot, unit, allowed)
-    if not (allowed and unit) then
-        if slot.model then slot.model:Hide() end
-        return false
-    end
-    if not slot.model then
-        local ok, model = pcall(CreateFrame, "PlayerModel", nil, slot)
-        if not ok or not model then return false end
-        model:SetSize(FIGURE_W, FIGURE_H)
-        model:SetPoint("TOP")
-        slot.model = model
-    end
-    if not pcall(slot.model.SetUnit, slot.model, unit) then slot.model:Hide(); return false end
-    slot.model:Show()
-    return true
 end
 
 -- Result table ------------------------------------------------------------------------------------------------
@@ -206,9 +187,7 @@ Report.views.group = function(report)
         slot:SetShown(row ~= nil)
         if row then
             local unit = report.units and report.units[row.name]
-            local figure = setFigure(slot, unit, report.models)
             slot.portrait:Set(row.name, row.role, unit)
-            slot.portrait.ring:SetShown(not figure)
             slot.name:SetText(row.name)
             Report.ClassColor(slot.name, row.classFile)
             local className = Report.ClassName(row)

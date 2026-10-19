@@ -497,7 +497,7 @@ function Report.ShowEmpty()
     window:Show()
 end
 
--- report: { run, result, names, units?, models?, best?, sample? } (PaTiChronicle.lua; Sample.lua for test mode).
+-- report: { run, result, names, units?, best?, sample? } (PaTiChronicle.lua; Sample.lua for test mode).
 function Report.Show(report, tab)
     shownReport = report
     setEmpty(false)

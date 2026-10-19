@@ -1,6 +1,9 @@
 # Changelog
 
 Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed, Removed, Known Issues.
+### Fixed
+- Group result: always the portrait, no 3D character (owner 2026-10-19: the 3D figure came and went).
+
 
 ## [Unreleased] — 0.2.0 PaTiChronicle
 ### Changed

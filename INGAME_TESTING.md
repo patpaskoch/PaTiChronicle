@@ -89,11 +89,14 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   Spielwelt ab (keine Namensschilder scheinen durch, Deckkraft 100 %)
 - [ ] PT-CHRON-062 Reiter als Text mit Unterstrich (keine Knöpfe): Übersicht, Gruppenergebnis, Meine Leistung,
   Verlauf; Maus darüber hellt auf; aktiver Reiter unterstrichen
-- [ ] PT-CHRON-063 Gruppenergebnis: fünf Mitglieder nebeneinander (3D-Figur, wenn die Probe „ok“ meldet, sonst Porträt),
+- [ ] PT-CHRON-063 Gruppenergebnis: fünf Mitglieder nebeneinander als Porträt (keine 3D-Figur),
   Name, Klasse mit Stufe, Rolle in Rollenfarbe; Tabelle in fester Reihenfolge Tank, Heiler, Schaden: TODE, ZEIT TOT,
   ANGRIFFE 3 S+, DABEI; Korr 1 / 0:42 / 1, Nyra 1 / 0:39; Arden bei Angriffen „-“; deine Zeile mit Strich und „(du)“;
   Zeile „Gruppe“ mit „kein Wipe“; Reiter „Beitrag“ ausgegraut mit Tooltip
-- [ ] PT-CHRON-064 Klick auf ein Porträt in der Übersicht öffnet das Gruppenergebnis; Klick auf eine Zeile oder Figur
+  - ❌ FAIL 2026-10-19 (Owner: mal ganze Figuren, mal nur Porträts — bitte nur Porträts)
+  - 🔧 FIX IMPLEMENTED 2026-10-19 (immer das Porträt, keine 3D-Figur mehr)
+  - MANUAL RETEST REQUIRED
+- [ ] PT-CHRON-064 Klick auf ein Porträt in der Übersicht öffnet das Gruppenergebnis; Klick auf eine Zeile oder ein Porträt
   zeigt darunter die Zeiten („Korr: gestorben 14:05 · angegriffen 9:13“); „n. v.“-Felder erklären im Tooltip warum
 - [ ] PT-CHRON-065 Meine Leistung: großer Name in Klassenfarbe, „Magier · Schaden · Stufe 20“; DARAUF KANNST DU STOLZ
   SEIN mit drei Erfolgen; DEINE ENTWICKLUNG ohne Balken: „Laufzeit 24:13 – 2:29 schneller als dein Schnitt (26:42)“

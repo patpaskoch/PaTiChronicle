@@ -16,7 +16,7 @@ Opens when a run ends (or with `/pchron`). A calm results screen with four tabs 
 the group, then your part, then the details:
 - **Overview** — completed, the dungeon, the run time large, a new best time, the group (portrait, name in class
   colour, class and role), achievements as medallions and two highlights of the run.
-- **Group result** — the five members side by side (a 3D character where the client allows it, else the portrait)
+- **Group result** — the five members side by side as portraits
   and a table in fixed order (tank, healer, damage — never sorted by values): deaths, time dead, attacks of 3 s or
   more, time in the group, the group total. A click shows the times. Damage, healing and interrupts only once the
   client's damage meter is confirmed. Missing values show "n/a" with the reason — never 0.

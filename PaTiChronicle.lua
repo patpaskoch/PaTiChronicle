@@ -127,7 +127,6 @@ end
 
 local function showReport(report, tab)
     report.units = units()
-    report.models = DB.probe.model == "ok" -- 3D characters only where the probe saw PlayerModel:SetUnit work
     Report.Show(report, tab)
 end
 
