@@ -22,6 +22,9 @@ Run.AGGRO_SECONDS = 3 -- an aggro moment: an enemy attacks a non-tank for at lea
 Run.MAX_EVENTS = 200
 Run.MAX_FIGHTS = 300
 Run.MAX_TIMES = 10 -- death and attack times kept per member
+-- Your own death ends combat for you (PLAYER_REGEN_ENABLED) before the last member dies (owner 2026-10-19: "all
+-- dead, no wipe shown"): a wipe still belongs to the last fight when it ended at most this long ago.
+Run.WIPE_GRACE = 60
 Run.VERSION = 3 -- runs from version 3 on carry per-member values (attacked, dead time, presence); older: "n/a"
 
 -- instance: { key, name } (key = instance ID or name); me: { name, role } (role: TANK/HEALER/DAMAGER/NONE).
@@ -98,6 +101,13 @@ local function currentFight(run)
     if fight and not fight.e then return fight end
 end
 
+-- The fight a wipe belongs to: the open one, or the last one that ended within WIPE_GRACE.
+local function wipeFight(run, now)
+    local fight = run.fights[#run.fights]
+    if not fight then return nil end
+    if not fight.e or offset(run, now) - fight.e <= Run.WIPE_GRACE then return fight end
+end
+
 -- clock: GetTime() (seconds, fractions), used only to time aggro moments in memory.
 local function closeAggro(run, name, clock, now)
     local open = run.open[name]
@@ -157,7 +167,7 @@ function Run.DeathState(run, name, dead, allDead, now)
         run.deadSince[name] = offset(run, now)
     end
     event(run, now, "death", { name = name })
-    local fight = currentFight(run)
+    local fight = wipeFight(run, now)
     if allDead and fight and not fight.wipe then
         fight.wipe = true
         run.wipes = run.wipes + 1

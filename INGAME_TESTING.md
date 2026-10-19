@@ -59,6 +59,11 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 - [ ] PT-CHRON-024 Nächster Run im selben Dungeon: beim Endboss endet der Run von selbst
 - [ ] PT-CHRON-025 „Run abbrechen“: Chat „Run abgebrochen … wird nicht gespeichert“, die Bestzeit bleibt
 - [ ] PT-CHRON-026 Während eines Runs einen anderen Dungeon betreten: der alte Run wird abgebrochen
+- [ ] PT-CHRON-027 Wipe (alle tot, auch wenn du zuerst stirbst): im Verlauf „Wipe“, im Gruppenergebnis Zeile
+  „Gruppe“ mit „1 Wipes“, in der Übersicht der Wipe als Höhepunkt; Erfolg „Kein Wipe“ gibt es nicht
+  - ❌ FAIL 2026-10-19 (Owner: alle tot, kein Wipe angezeigt — dein Tod beendet den Kampf vor dem letzten Tod)
+  - 🔧 FIX IMPLEMENTED 2026-10-19 (Wipe gehört zum letzten Kampf, wenn er höchstens 60 s vorher endete)
+  - MANUAL RETEST REQUIRED
 
 ## Run-Bericht
 
