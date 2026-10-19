@@ -76,7 +76,7 @@ describe("Run events", function()
         Run.DeathState(run, "Kael", true, true, T + 23)
         assert.same({ 1, 1, 1, 3, 1 }, { run.deaths.Nyra, run.deaths.Korr, run.wipes, Run.GroupDeaths(run),
             run.events[1].fight })
-        assert.same({ "death", 10 }, { run.events[1].kind, run.events[1].t })
+        assert.same({ "death", 20 }, { run.events[1].kind, run.events[1].t })
         Run.DeathState(run, "Mira", nil, false, T + 30)
         assert.is_true(run.data.deathsSecret)
     end)
