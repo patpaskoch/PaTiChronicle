@@ -5,13 +5,14 @@ local _, ns = ...
 local Logic = {}
 ns.Logic = Logic
 
-Logic.SCHEMA = 2
+Logic.SCHEMA = 3
 Logic.MAX_ENCOUNTERS = 20 -- boss fight events kept by the probe
 Logic.SCALES = { 0.8, 0.9, 1, 1.1, 1.25 }
 Logic.ROLES = { "AUTO", "TANK", "HEALER", "DAMAGER" } -- myRole: AUTO = the group role the client reports
 
 Logic.DEFAULTS = {
-    opacity = 0.75, -- panel body opacity (PaTiShared window; 0.3–1)
+    opacity = 1, -- panel body opacity (PaTiShared window; 0.3–1). The report is a page to read: fully opaque
+    groupCategory = "survival", -- tab "Group result": "survival" | "contribution"
     theme = "woforever", -- gold and bronze
     locked = false,
     scale = 1,
@@ -31,13 +32,18 @@ end
 local function isList(value) return type(value) == "table" end
 
 -- SavedVariables: { schema, settings (DEFAULTS), position, hud (its position), probe, run, report, runs, bests,
--- groupBests, teams, streaks, endBosses }. Schema 1 (PaTiCompetition 0.1.0, copied over once by hand): settings
+-- groupBests, teams, streaks, endBosses, groupCategory }. Runs recorded before schema 3 have no per-member values
+-- (they show "n/a"; Run.VERSION). Schema 1 (PaTiCompetition 0.1.0, copied over once by hand): settings
 -- and position stay, the old probe (combat log totals) is replaced, the rest starts empty. Broken values are
 -- replaced.
 function Logic.Migrate(db)
     if type(db) ~= "table" then db = {} end
-    local oldProbe = (db.schema or 1) < 2 or not isList(db.probe) or not isList(db.probe.threat)
+    local schema = db.schema or 1
+    local oldProbe = schema < 2 or not isList(db.probe) or not isList(db.probe.threat)
     if oldProbe then db.probe = Logic.NewProbe() end
+    -- Schema 3 (redesign 2026-10-19): the old default opacity 0.75 let the world shine through; it becomes 1 once.
+    -- Any other saved value was the player's own choice and stays.
+    if schema < 3 and db.opacity == 0.75 then db.opacity = 1 end
     for key, value in pairs(Logic.DEFAULTS) do
         if db[key] == nil then db[key] = value end
     end
@@ -50,6 +56,7 @@ function Logic.Migrate(db)
         if not isList(db[key]) then db[key] = {} end
     end
     if db.run ~= nil and (not isList(db.run) or db.run.state ~= "running") then db.run = nil end
+    if db.groupCategory ~= "survival" and db.groupCategory ~= "contribution" then db.groupCategory = "survival" end
     if db.report ~= nil and (not isList(db.report) or not isList(db.report.run)) then db.report = nil end
     db.schema = Logic.SCHEMA
     return db

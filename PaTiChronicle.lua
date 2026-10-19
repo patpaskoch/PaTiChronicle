@@ -90,6 +90,7 @@ end
 local function noteMembers(run)
     for unit, name in pairs(memberUnits) do Run.AddMember(run, memberInfo(unit, name)) end
     run.tank = tankName() or run.tank
+    Run.Presence(run, groupNames(), time())
 end
 
 -- Runs -----------------------------------------------------------------------------------------------------------

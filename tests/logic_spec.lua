@@ -6,9 +6,9 @@ local function load()
 end
 
 describe("Logic.Migrate", function()
-    it("starts an empty schema 2 save with the default settings", function()
+    it("starts an empty schema 3 save with the default settings", function()
         local db = load().Migrate(nil)
-        assert.same({ 2, "woforever", true, true, "AUTO" },
+        assert.same({ 3, "woforever", true, true, "AUTO" },
             { db.schema, db.theme, db.showHud, db.openReport, db.myRole })
         assert.same({ {}, {}, {}, {}, {}, {} },
             { db.runs, db.bests, db.groupBests, db.teams, db.streaks, db.endBosses })
@@ -34,6 +34,14 @@ describe("Logic.Migrate", function()
         assert.is_nil(db.report)
         db.run = { state = "running" }
         assert.same({ state = "running" }, Logic.Migrate(db).run)
+    end)
+
+    it("schema 3 sets the old default opacity 0.75 to 1 once; a chosen value and a schema 3 save stay", function()
+        local Logic = load()
+        assert.same({ 1, 0.9, 0.75 }, { Logic.Migrate({ schema = 2, opacity = 0.75 }).opacity,
+            Logic.Migrate({ schema = 2, opacity = 0.9 }).opacity,
+            Logic.Migrate({ schema = 3, opacity = 0.75 }).opacity })
+        assert.equal("survival", Logic.Migrate({ groupCategory = "x" }).groupCategory)
     end)
 
     it("restores the default settings and keeps runs, position and probe", function()

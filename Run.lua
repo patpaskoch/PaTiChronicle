@@ -21,12 +21,15 @@ Run.MIN_COUNTED = 3
 Run.AGGRO_SECONDS = 3 -- an aggro moment: an enemy attacks a non-tank for at least this long without a break
 Run.MAX_EVENTS = 200
 Run.MAX_FIGHTS = 300
+Run.MAX_TIMES = 10 -- death and attack times kept per member
+Run.VERSION = 3 -- runs from version 3 on carry per-member values (attacked, dead time, presence); older: "n/a"
 
 -- instance: { key, name } (key = instance ID or name); me: { name, role } (role: TANK/HEALER/DAMAGER/NONE).
 function Run.New(instance, now, me)
     return { key = instance.key, name = instance.name, start = now, state = "running", complete = true,
         me = me.name, myRole = me.role or "NONE", members = {}, fights = {}, events = {}, deaths = {},
-        wipes = 0, aggro = { mine = 0, others = 0 }, open = {},
+        wipes = 0, aggro = { mine = 0, others = 0 }, open = {}, version = Run.VERSION,
+        attacked = {}, deathTimes = {}, deadSince = {}, deadTime = {}, present = {},
         data = { deaths = false, deathsSecret = false, threat = false, threatSecret = false, bosses = false } }
 end
 
@@ -103,8 +106,16 @@ local function closeAggro(run, name, clock, now)
     local seconds = clock - open.since
     if seconds < Run.AGGRO_SECONDS then return end
     if open.mine then run.aggro.mine = run.aggro.mine + 1 else run.aggro.others = run.aggro.others + 1 end
-    -- Only your own moments carry a name: the others' are never put on a person (owner decision).
-    event(run, now - seconds, "aggro", { mine = open.mine, seconds = math.floor(seconds + 0.5) })
+    local start = now - seconds
+    -- Timeline: only your own moments carry a name (owner decision). The group table counts per member
+    -- (owner wish 2026-10-19: "Tode und Aggro pro Spieler"), shown as attacks, never as a cause.
+    event(run, start, "aggro", { mine = open.mine, seconds = math.floor(seconds + 0.5) })
+    if run.attacked then
+        local entry = run.attacked[name] or { count = 0, seconds = 0, times = {} }
+        run.attacked[name] = entry
+        entry.count, entry.seconds = entry.count + 1, entry.seconds + math.floor(seconds + 0.5)
+        if #entry.times < Run.MAX_TIMES then entry.times[#entry.times + 1] = offset(run, start) end
+    end
 end
 
 function Run.FightEnd(run, now, clock)
@@ -133,8 +144,18 @@ function Run.DeathState(run, name, dead, allDead, now)
     run.alive = run.alive or {}
     local wasDead = run.alive[name] == false
     run.alive[name] = not dead
+    if not dead and wasDead and run.deadSince and run.deadSince[name] then
+        run.deadTime[name] = (run.deadTime[name] or 0) + offset(run, now) - run.deadSince[name]
+        run.deadSince[name] = nil
+    end
     if not dead or wasDead then return end
     run.deaths[name] = (run.deaths[name] or 0) + 1
+    if run.deathTimes then
+        local times = run.deathTimes[name] or {}
+        run.deathTimes[name] = times
+        if #times < Run.MAX_TIMES then times[#times + 1] = offset(run, now) end
+        run.deadSince[name] = offset(run, now)
+    end
     event(run, now, "death", { name = name })
     local fight = currentFight(run)
     if allDead and fight and not fight.wipe then
@@ -165,13 +186,51 @@ function Run.LastBoss(run, now, within)
     end
 end
 
+-- Who is in the group now (names): newcomers start their time, those gone end it; a return continues it.
+function Run.Presence(run, names, now)
+    if not run.present then return end
+    local here = {}
+    for _, name in ipairs(names) do
+        here[name] = true
+        local entry = run.present[name]
+        if not entry then
+            run.present[name] = { from = offset(run, now) }
+        elseif entry.to then -- back again: the time before counts too
+            entry.seconds = (entry.seconds or 0) + entry.to - entry.from
+            entry.from, entry.to = offset(run, now), nil
+        end
+    end
+    for name, entry in pairs(run.present) do
+        if not here[name] and not entry.to then entry.to = offset(run, now) end
+    end
+end
+
+-- Seconds a member was in the group during the run (nil = not recorded).
+function Run.PresentSeconds(run, name)
+    local entry = run.present and run.present[name]
+    if not entry then return nil end
+    local stop = entry.to or Run.Duration(run, run.now)
+    return (entry.seconds or 0) + math.max(0, stop - entry.from)
+end
+
+-- The end: members still dead count their time until now.
+local function closeDeadTimes(run, now)
+    if not run.deadSince then return end
+    for name, since in pairs(run.deadSince) do
+        run.deadTime[name] = (run.deadTime[name] or 0) + offset(run, now) - since
+        run.deadSince[name] = nil
+    end
+end
+
 function Run.Finish(run, now, how, clock)
     Run.FightEnd(run, now, clock or 0)
+    closeDeadTimes(run, now)
     run.state, run.finish, run.how = "completed", now, how
     return run
 end
 
 function Run.Abort(run, now, reason)
+    closeDeadTimes(run, now)
     run.state, run.finish, run.how = "aborted", now, reason
     return run
 end

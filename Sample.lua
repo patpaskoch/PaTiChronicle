@@ -42,6 +42,7 @@ function Sample.Report(dungeonName)
         names[#names + 1] = member.name
         Run.DeathState(run, member.name, false, false, START)
     end
+    Run.Presence(run, names, START)
     for _, fight in ipairs(FIGHTS) do
         Run.FightStart(run, START + fight[1])
         if fight[3] then Run.BossStart(run) end
@@ -53,6 +54,8 @@ function Sample.Report(dungeonName)
         if fight[1] == 790 then
             Run.DeathState(run, "Nyra", true, false, START + 842)
             Run.DeathState(run, "Korr", true, false, START + 845)
+            Run.DeathState(run, "Nyra", false, false, START + 881)
+            Run.DeathState(run, "Korr", false, false, START + 887)
         end
         if fight[3] then Run.BossEnd(run, START + fight[2], fight[3], true) end
         Run.FightEnd(run, START + fight[2], fight[2])

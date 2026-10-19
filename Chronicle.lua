@@ -89,8 +89,11 @@ function Chronicle.Development(history, summary)
             if value < avg - margin then state = "better" elseif value > avg + margin then state = "worse"
             else state = "same" end
         end
+        -- best: no earlier run of this dungeon and role was better ("your best run here"; needs earlier runs).
+        local best = value ~= nil and #earlier >= Chronicle.MIN_COMPARE
+        for _, earlierValue in ipairs(earlier) do best = best and value <= earlierValue end
         rows[#rows + 1] = { metric = metric, value = value, avg = avg, n = n, earlier = #earlier, trend = trend,
-            state = value == nil and "missing" or state }
+            state = value == nil and "missing" or state, best = best and state == "better" }
     end
     return rows
 end
@@ -204,6 +207,95 @@ function Chronicle.LearnEndBoss(db, run, now)
     if not id or db.endBosses[run.key] == id then return false end
     db.endBosses[run.key] = id
     return true
+end
+
+-- The group table (tab "Group result"): one row per name in the given order (never sorted by values).
+-- Every value is a number or nil + a reason: "GAP" (run with gaps), "DATA" (not readable), "OLD" (recorded before
+-- version 3), "TANK" (attacks belong to the tank's role), "NO_TANK" (tank unknown: others not counted).
+function Chronicle.PlayerRows(run, names)
+    local ok = Chronicle.Reliable(run)
+    local threat = run.complete and run.data.threat and not run.data.threatSecret
+    local recent = (run.version or 0) >= ns.Run.VERSION
+    local rows, total = {}, { deaths = 0, deadTime = 0, attacked = 0, known = {} }
+    local function value(row, key, number, reason)
+        if number ~= nil then
+            row[key] = number
+            if type(number) == "number" then
+                total[key] = total[key] + number
+                total.known[key] = true
+            end
+        else
+            row[key .. "Reason"] = reason
+        end
+    end
+    for _, name in ipairs(names) do
+        local member = run.members[name] or { name = name }
+        local row = { name = name, role = member.role, classFile = member.classFile, className = member.className,
+            level = member.level, me = name == run.me }
+        local deathReason = not run.complete and "GAP" or "DATA"
+        value(row, "deaths", ok.deaths and (run.deaths[name] or 0) or nil, deathReason)
+        value(row, "deadTime", ok.deaths and recent and (run.deadTime[name] or 0) or nil,
+            not recent and "OLD" or deathReason)
+        local isTank = name == run.tank or (member.role == "TANK")
+        local attacks, reason = nil, not run.complete and "GAP" or "DATA"
+        if isTank then reason = "TANK"
+        elseif not recent then reason = "OLD"
+        elseif threat and (run.tank or row.me) then attacks = (run.attacked[name] or {}).count or 0
+        elseif threat then reason = "NO_TANK" end
+        value(row, "attacked", attacks, reason)
+        row.attackTimes = recent and run.attacked[name] and run.attacked[name].times or nil
+        row.deathTimes = recent and run.deathTimes[name] or nil
+        row.present = recent and ns.Run.PresentSeconds(run, name) or nil
+        rows[#rows + 1] = row
+    end
+    return rows, total
+end
+
+-- Up to two highlights for the overview, by fixed rules (facts from the run, no causes): a wipe, else the fight
+-- with the most deaths; the longest fight (a minute or more); the end boss. Each: { t, id, args }.
+Chronicle.LONG_FIGHT = 60
+function Chronicle.Highlights(run)
+    local list = {}
+    local deathsByFight, firstWipe = {}, nil
+    for _, entry in ipairs(run.events) do
+        if entry.kind == "wipe" and not firstWipe then firstWipe = entry end
+        if entry.kind == "death" then
+            local fight = deathsByFight[entry.fight] or { count = 0, t = entry.t, fight = entry.fight }
+            deathsByFight[entry.fight] = fight
+            fight.count = fight.count + 1
+        end
+    end
+    if firstWipe then
+        list[#list + 1] = { t = firstWipe.t, id = "HL_WIPE", args = { fight = firstWipe.fight } }
+    else
+        local most
+        for _, fight in pairs(deathsByFight) do
+            if not most or fight.count > most.count or (fight.count == most.count and fight.t < most.t) then
+                most = fight
+            end
+        end
+        if most then
+            list[#list + 1] = { t = most.t, id = most.count > 1 and "HL_DEATHS" or "HL_DEATH",
+                args = { count = most.count, fight = most.fight } }
+        end
+    end
+    local longest, index = nil, nil
+    for fightIndex, fight in ipairs(run.fights) do
+        local seconds = (fight.e or fight.s) - fight.s
+        if seconds >= Chronicle.LONG_FIGHT and (not longest or seconds > longest) then
+            longest, index = seconds, fightIndex
+        end
+    end
+    if longest and #list < 2 then
+        local boss
+        for _, entry in ipairs(run.events) do
+            if entry.kind == "boss" and entry.fight == index then boss = entry.boss end
+        end
+        list[#list + 1] = { t = run.fights[index].s, id = boss and "HL_LONG_BOSS" or "HL_LONG",
+            args = { seconds = longest, fight = index, boss = boss } }
+    end
+    table.sort(list, function(a, b) return a.t < b.t end)
+    return list
 end
 
 -- Best time for the HUD (nil without one).
