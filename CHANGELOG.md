@@ -11,6 +11,8 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
   old PT-COMP-… are retired.
 
 ### Added
+- Theme **Soft Fantasy** (PaTiShared, owner wish 2026-10-19): calm slate blue, grey and violet with a muted
+  lavender accent — the fourth choice in the settings and in PaTiSuite.
 - Run report "Every run tells a story" (owner decision 2026-10-19) instead of player cards and a score: three tabs —
   Overview (dungeon, run time, new best time, the group without numbers per person, group achievements, your
   highlight, the run as a strip), My performance (your achievements and your development against your own average
