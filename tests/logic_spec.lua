@@ -50,8 +50,8 @@ describe("Logic.Record", function()
         record(entry("UNIT_DIED", nil, HEALER))
         record(entry("SPELL_DAMAGE", ME, MOB, 1, "x", 1, SECRET, 0))
         record(entry("SPELL_CAST_START", ME, MOB))
-        assert.same({ done = 100, taken = 40, heal = 0, deaths = 0 }, probe.players.Pati)
-        assert.same({ done = 0, taken = 0, heal = 40, deaths = 1 }, probe.players.Heali)
+        assert.same({ done = 100, taken = 40, heal = 0, deaths = 0, aggro = 0 }, probe.players.Pati)
+        assert.same({ done = 0, taken = 0, heal = 40, deaths = 1, aggro = 0 }, probe.players.Heali)
         assert.same({ { id = 639, name = "Edwin" } }, probe.deaths)
         assert.same({ 7, 5, 1 }, { probe.combatLog.total, probe.combatLog.counted, probe.combatLog.secret })
     end)
@@ -73,6 +73,26 @@ describe("Logic.Record", function()
         local names = {}
         for _, row in ipairs(Logic.Ranking(probe)) do names[#names + 1] = row.name end
         assert.same({ "C", "A", "B" }, names)
+    end)
+end)
+
+describe("Logic.RecordThreat", function()
+    it("counts pulled aggro when the status rises to 2 or more, keeps the role", function()
+        local Logic = load()
+        local probe = Logic.NewProbe()
+        for _, step in ipairs({ { nil, 0 }, { 0, 3 }, { 3, 2 }, { 2, nil }, { nil, 2 }, { 2, 1 }, { 1, 3 } }) do
+            Logic.RecordThreat(probe, "Pati", "DAMAGER", step[1], step[2])
+        end
+        assert.same({ 3, "DAMAGER" }, { probe.players.Pati.aggro, probe.players.Pati.role })
+    end)
+
+    it("reads an older saved entry without aggro", function()
+        local Logic = load()
+        local probe = Logic.NewProbe()
+        probe.players.Old = { done = 1, taken = 0, heal = 0, deaths = 0 }
+        assert.equal(0, Logic.Ranking(probe)[1].aggro)
+        Logic.RecordThreat(probe, "Old", nil, 0, 3)
+        assert.equal(1, probe.players.Old.aggro)
     end)
 end)
 

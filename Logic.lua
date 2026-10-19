@@ -73,7 +73,7 @@ end
 local function player(probe, name)
     local entry = probe.players[name]
     if not entry then
-        entry = { done = 0, taken = 0, heal = 0, deaths = 0 }
+        entry = { done = 0, taken = 0, heal = 0, deaths = 0, aggro = 0 }
         probe.players[name] = entry
     end
     return entry
@@ -100,6 +100,15 @@ function Logic.Record(probe, entry, members)
             push(probe.deaths, { id = Logic.NpcId(entry.dest), name = entry.destName }, Logic.MAX_DEATHS)
         end
     end
+end
+
+-- Pulled aggro: a member's threat status (UnitThreatSituation 0-3; 2 and 3 = an enemy attacks them) rises from
+-- below 2 to 2 or more. Counted for every role; the score (later) gives minus points except for the tank.
+function Logic.RecordThreat(probe, name, role, previous, status)
+    if type(status) ~= "number" then return end
+    local entry = player(probe, name)
+    entry.role = role or entry.role
+    if status >= 2 and (type(previous) ~= "number" or previous < 2) then entry.aggro = (entry.aggro or 0) + 1 end
 end
 
 -- event: "ENCOUNTER_START" | "ENCOUNTER_END" | "BOSS_KILL"; success only for ENCOUNTER_END (1/true = killed).
@@ -136,7 +145,7 @@ function Logic.Ranking(probe)
     local list = {}
     for name, entry in pairs(probe.players) do
         list[#list + 1] = { name = name, done = entry.done, taken = entry.taken, heal = entry.heal,
-            deaths = entry.deaths }
+            deaths = entry.deaths, aggro = entry.aggro or 0, role = entry.role }
     end
     table.sort(list, function(a, b)
         if a.done ~= b.done then return a.done > b.done end

@@ -7,6 +7,8 @@ local UI, L, Logic = ns.UI, ns.UI.L, ns.Logic
 
 local DB
 local members = {} -- { [guid] = name }: player, party and their pets (a pet counts for its owner)
+local memberUnits = {} -- { [unit] = name }: player and party (whose threat status is watched)
+local threatStatus = {} -- { [unit] = last UnitThreatSituation }, runtime only
 
 local function say(key, ...)
     print("|cff68caffPaTiCompetition:|r " .. L[key]:format(...))
@@ -33,11 +35,14 @@ end
 local function addMember(unit, ownerUnit)
     if not UnitExists or not flag(UnitExists(unit)) or not UnitGUID or not UnitName then return end
     local guid, name = UnitGUID(unit), UnitName(ownerUnit or unit)
-    if guid and name and not isSecret(guid) and not isSecret(name) then members[guid] = name end
+    if guid and name and not isSecret(guid) and not isSecret(name) then
+        members[guid] = name
+        if not ownerUnit then memberUnits[unit] = name end
+    end
 end
 
 local function readMembers()
-    members = {}
+    members, memberUnits = {}, {}
     addMember("player"); addMember("pet", "player")
     for index = 1, 4 do addMember("party" .. index); addMember("partypet" .. index, "party" .. index) end
 end
@@ -45,7 +50,8 @@ end
 -- Events ---------------------------------------------------------------------------------------------------------
 
 -- Events that may not exist in this client: RegisterEvent raises an error for unknown names, so each is tried once.
-local OPTIONAL = { "COMBAT_LOG_EVENT_UNFILTERED", "ENCOUNTER_START", "ENCOUNTER_END", "BOSS_KILL" }
+local OPTIONAL = { "COMBAT_LOG_EVENT_UNFILTERED", "ENCOUNTER_START", "ENCOUNTER_END", "BOSS_KILL",
+    "UNIT_THREAT_SITUATION_UPDATE" }
 local registered = {}
 local events = CreateFrame("Frame")
 for _, event in ipairs({ "PLAYER_LOGIN", "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE", "UNIT_PET",
@@ -59,6 +65,18 @@ local function onCombatLog(...)
     if CombatLogGetCurrentEventInfo then entry = Logic.Parse(isSecret, CombatLogGetCurrentEventInfo())
     else entry = Logic.Parse(isSecret, ...) end -- older clients pass the entry as the event's arguments
     Logic.Record(DB.probe, entry, members)
+end
+
+-- UnitThreatSituation(unit) without an enemy: the highest status against any enemy (nil out of combat).
+local function onThreat(unit)
+    local name = unit and memberUnits[unit]
+    if not name or not UnitThreatSituation then return end
+    local ok, status = pcall(UnitThreatSituation, unit)
+    if not ok or isSecret(status) then return end
+    local role = UnitGroupRolesAssigned and UnitGroupRolesAssigned(unit)
+    if isSecret(role) then role = nil end
+    Logic.RecordThreat(DB.probe, name, role, threatStatus[unit], status)
+    threatStatus[unit] = status
 end
 
 local function onEncounter(event, id, name, ...)
@@ -97,6 +115,8 @@ events:SetScript("OnEvent", function(_, event, ...)
         onCombatLog(...)
     elseif event == "ENCOUNTER_START" or event == "ENCOUNTER_END" or event == "BOSS_KILL" then
         onEncounter(event, ...)
+    elseif event == "UNIT_THREAT_SITUATION_UPDATE" then
+        onThreat(...)
     elseif event == "PLAYER_REGEN_DISABLED" then
         local instance = currentInstance()
         if instance and Logic.StartRun(DB.probe, instance, GetTime()) then say("PROBE_RUN_STARTED", instance) end
@@ -122,7 +142,7 @@ local function printProbe()
         say("PROBE_RUN", probe.run.instance, Logic.Clock(Logic.RunTime(probe, GetTime())))
     end
     for _, row in ipairs(Logic.Ranking(probe)) do
-        say("PROBE_PLAYER", row.name, row.done, row.taken, row.heal, row.deaths)
+        say("PROBE_PLAYER", row.name, tostring(row.role or "-"), row.done, row.taken, row.heal, row.deaths, row.aggro)
     end
     for _, fight in ipairs(probe.encounters) do
         say("PROBE_FIGHT", fight.event, tostring(fight.name), tostring(fight.id), tostring(fight.success),

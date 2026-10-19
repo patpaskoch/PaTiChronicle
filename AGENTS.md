@@ -4,8 +4,9 @@
 Addon facts: `../../PaTiAdmin/docs/ARCHITECTURE.md` · open issues: `../../PaTiAdmin/docs/FOLLOW_UPS.md`.
 
 ## This addon
-- Purpose: dungeon competition — run clock until the end boss, end screen with damage, damage taken, healing and a
-  score per member. **Display only:** never casts, targets, marks or sends anything; no addon messages.
+- Purpose: dungeon competition — run clock until the end boss, end screen with damage, damage taken, healing, pulled
+  aggro and a score per member (pulled aggro: minus points except for the tank).
+  **Display only:** never casts, targets, marks or sends anything; no addon messages.
 - 0.1.0 = the test run (probe): what the Forever client delivers (combat log, secret values, boss fight events).
   Build the clock window and the end screen only on what the probe confirmed (docs/WOW_API_COMPAT.md).
 - Files: `Logic.lua` (combat-log parsing, totals, run clock, migration; pure, tested) · `PaTiCompetition.lua`

@@ -36,3 +36,6 @@ Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github
 - [ ] PT-COMP-015 Nach dem Dungeon `/pcomp probe`: Liste der Bosskämpfe und „Gespeicherte Gegner-Tode“ mit dem letzten
   Gegner und Nummer (Ausgabe melden; daraus entsteht die Endboss-Liste)
 - [ ] PT-COMP-016 `/pcomp reset`: „Testergebnis gelöscht.“, danach zeigt `/pcomp probe` wieder 0 Einträge
+- [ ] PT-COMP-017 In der Gruppe: zieht ein Nicht-Tank Aggro (ein Gegner haut ihn), steht bei `/pcomp probe` hinter
+  seinem Namen „Aggro gezogen 1“ (oder mehr) und seine Rolle; beim Tank zählt es auch
+  (gibt später aber keine Minuspunkte)
