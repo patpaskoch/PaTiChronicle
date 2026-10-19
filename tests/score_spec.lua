@@ -40,6 +40,21 @@ describe("Score.Apply", function()
         assert.equal(3, Score.Best(rows))
     end)
 
+    it("splits the score into points per value; the share counts only once", function()
+        local Score = load()
+        local rows = {
+            row("Tank", "TANK", { done = 50, taken = 300, interrupts = 2, kills = 1, aggro = 9 }),
+            row("Dps", "DAMAGER", { done = 100, taken = 200, interrupts = 1, kills = 4, deaths = 1, aggro = 2 }),
+        }
+        local limits = Score.Apply(rows)
+        assert.same({ done = 0, heal = 0, taken = 50, interrupts = 15, kills = 3.75, deaths = 0, aggro = 0 },
+            rows[1].parts)
+        -- Damage taken counts only for the tank.
+        assert.same({ done = 50, heal = 0, taken = 0, interrupts = 7.5, kills = 15, deaths = -10, aggro = -10 },
+            rows[2].parts)
+        assert.same({ 50, 15, Score.PENALTY_BAR }, { limits.done, limits.interrupts, limits.deaths })
+    end)
+
     it("gives the interrupt and killing blow points to the share when nobody has any; stays within 0-100", function()
         local Score = load()
         local rows = { row("A", "DAMAGER", { done = 10 }), row("B", "DAMAGER", { done = 5, deaths = 9 }) }

@@ -27,6 +27,10 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 
 - End screen: the score also as a bar 0–100 under the number (role colour, gold for the best; owner 2026-10-19).
 
+- End screen easier to read (owner 2026-10-19): more space and a line between the values; every value shows the
+  points it gives as a bar and a number (green plus, red minus); level and class (class colour) under the name.
+  Cards 176 × 500.
+
 ### Removed
 - The combat log is no longer read (owner screenshot 2026-10-19: "PaTiCompetition wurde geblockt"): this client
   reserves `COMBAT_LOG_EVENT_UNFILTERED` for the Blizzard UI. The test run now checks for `C_DamageMeter` instead.

@@ -129,18 +129,30 @@ local function unitOf(name)
     end
 end
 
+-- What the client tells about a member still in the group: role, level, class (a secret value is left out).
+local function readUnit(row)
+    row.unit = unitOf(row.name)
+    local unit = row.unit
+    if not unit then return end
+    local role = UnitGroupRolesAssigned and UnitGroupRolesAssigned(unit)
+    if role and not isSecret(role) then row.role = role end
+    local level = UnitLevel and UnitLevel(unit)
+    if type(level) == "number" and not isSecret(level) and level > 0 then row.level = level end
+    if UnitClass then
+        local className, classFile = UnitClass(unit)
+        if type(className) == "string" and not isSecret(className) then row.className = className end
+        if type(classFile) == "string" and not isSecret(classFile) then row.classFile = classFile end
+    end
+end
+
 -- The current run (or, without a run, everything since the last clear); in test mode the example values.
 local function showResults()
     local sample = testMode
     local rows = sample and Score.Sample() or Logic.Ranking(DB.probe)
     if not sample then
-        for _, row in ipairs(rows) do
-            row.unit = unitOf(row.name)
-            local role = row.unit and UnitGroupRolesAssigned and UnitGroupRolesAssigned(row.unit)
-            if role and not isSecret(role) then row.role = role end
-        end
+        for _, row in ipairs(rows) do readUnit(row) end
     end
-    Score.Apply(rows)
+    local limits = Score.Apply(rows)
     Score.Order(rows)
     local best = Score.Best(rows)
     local run = DB.probe.run
@@ -149,7 +161,7 @@ local function showResults()
     elseif run then
         subtitle = L.RESULTS_SUBTITLE_RUN:format(run.instance, Logic.Clock(Logic.RunTime(DB.probe, GetTime())))
     end
-    Results.Show(rows, best, { subtitle = subtitle, sample = sample })
+    Results.Show(rows, best, { subtitle = subtitle, sample = sample, limits = limits })
 end
 
 local function setShown(shown) -- no secure frames: fine in combat

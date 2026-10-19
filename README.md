@@ -24,8 +24,9 @@ Results are saved in `PaTiCompetitionDB` (SavedVariables, per character) with `/
 ## End screen "Party Competition"
 `/pcomp show` opens it with the values of the current run, `/pcomp test` with example values. Five cards side by
 side (tank, healer, then damage dealers), each with portrait (framed in the role colour: tank blue, healer green,
-damage red), name, role, damage, healing, damage taken, interrupts, killing blows, pulled aggro, deaths and the
-score (number and bar 0–100). The best score gets a gold frame. Esc or ••• → Hide closes it. Colours: WoForever theme (gold and bronze)
+damage red), name, level and class (class colour), role, damage, healing, damage taken, interrupts, killing blows,
+pulled aggro, deaths and the score (number and bar 0–100). Each value row has a bar with the points it gives (green
+plus points, red minus points) and the points as a number; thin lines separate the rows. The best score gets a gold frame. Esc or ••• → Hide closes it. Colours: WoForever theme (gold and bronze)
 by default; PaTiSuite can switch it.
 
 **Score (0–100), relative to the group of this run:** 20 base + 50 × your best share (damage ÷ most damage, healing ÷

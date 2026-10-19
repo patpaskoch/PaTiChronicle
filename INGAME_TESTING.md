@@ -70,5 +70,11 @@ Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github
   (Rückmeldung zur Formel)
 - ~~PT-COMP-025 Unterbrechungen und Todesstöße werden gezählt: Werte auf der Karte und bei `/pcomp probe`~~
   - RETIRED 2026-10-19 – kamen aus dem Kampflog (der Blizzard-UI vorbehalten)
+- [ ] PT-COMP-027 Werte gut lesbar: Abstand und eine feine Linie zwischen den Zeilen; Name des Werts links, Zahl
+  rechts; nichts abgeschnitten oder überlappt (auch „Erlittener Schaden“, „Unterbrechungen“)
+- [ ] PT-COMP-028 Unter jedem Wert ein Punkte-Balken mit Zahl rechts („+50“, „-10“, „0“): Plus grün, Minus rot (Tode,
+  Aggro gezogen); Schaden / Heilung / erlittener Schaden: nur der stärkste Wert hat Punkte (zählt einmal)
+- [ ] PT-COMP-029 Unter dem Namen Stufe und Klasse in Klassenfarbe („Stufe 60 Krieger“); bei `/pcomp test` die
+  Beispielklassen, bei `/pcomp show` die echten deiner Gruppe
 - [ ] PT-COMP-026 Unter der Wertung ein Balken: so lang wie die Wertung (91 / 100 = fast voll), in Rollenfarbe, bei der
   besten Wertung gold; Wertung 0 = leerer Balken; nichts überlappt mit „WERTUNG“ oder der Zahl

@@ -12,6 +12,7 @@ ns.Score = Score
 -- − DEATH per death, − AGGRO per pulled aggro (not for the tank)
 Score.BASE, Score.SHARE, Score.INTERRUPTS, Score.KILLS = 20, 50, 15, 15
 Score.DEATH, Score.AGGRO = 10, 5
+Score.PENALTY_BAR = 20 -- minus points that fill a penalty bar on the end screen (2 deaths or 4 pulled aggro)
 
 local function most(rows, key)
     local best = 0
@@ -36,21 +37,36 @@ function Score.MarkTank(rows)
     if tank then tank.tank = true end
 end
 
--- Adds row.tank and row.score to every row.
+-- The share counts once: the best of damage, healing and (tank only) damage taken. First one wins a tie.
+local SHARE_KEYS = { "done", "heal", "taken" }
+
+-- Adds row.tank, row.parts (points per value, the minus points negative) and row.score to every row.
+-- Returns the most points each value can give ({ done = …, interrupts = …, deaths = PENALTY_BAR … }), for bars.
 function Score.Apply(rows)
     Score.MarkTank(rows)
-    local bestDone, bestHeal, bestTaken = most(rows, "done"), most(rows, "heal"), most(rows, "taken")
-    local bestInterrupts, bestKills = most(rows, "interrupts"), most(rows, "kills")
-    local shareWeight = Score.SHARE + (bestInterrupts > 0 and 0 or Score.INTERRUPTS)
-        + (bestKills > 0 and 0 or Score.KILLS)
+    local best = {}
+    for _, key in ipairs({ "done", "heal", "taken", "interrupts", "kills" }) do best[key] = most(rows, key) end
+    local shareWeight = Score.SHARE + (best.interrupts > 0 and 0 or Score.INTERRUPTS)
+        + (best.kills > 0 and 0 or Score.KILLS)
     for _, row in ipairs(rows) do
-        local part = math.max(share(row.done, bestDone), share(row.heal, bestHeal),
-            row.tank and share(row.taken, bestTaken) or 0)
-        local points = Score.BASE + shareWeight * part
-            + Score.INTERRUPTS * share(row.interrupts, bestInterrupts) + Score.KILLS * share(row.kills, bestKills)
-            - Score.DEATH * (row.deaths or 0) - (row.tank and 0 or Score.AGGRO * (row.aggro or 0))
+        local parts = { done = 0, heal = 0, taken = 0 }
+        local mainKey, main = nil, 0
+        for _, key in ipairs(SHARE_KEYS) do
+            local value = (key ~= "taken" or row.tank) and share(row[key], best[key]) or 0
+            if value > main then mainKey, main = key, value end
+        end
+        if mainKey then parts[mainKey] = shareWeight * main end
+        parts.interrupts = Score.INTERRUPTS * share(row.interrupts, best.interrupts)
+        parts.kills = Score.KILLS * share(row.kills, best.kills)
+        parts.deaths = -Score.DEATH * (row.deaths or 0)
+        parts.aggro = row.tank and 0 or -Score.AGGRO * (row.aggro or 0)
+        local points = Score.BASE
+        for _, value in pairs(parts) do points = points + value end
+        row.parts = parts
         row.score = math.max(0, math.min(100, math.floor(points + 0.5)))
     end
+    return { done = shareWeight, heal = shareWeight, taken = shareWeight, interrupts = Score.INTERRUPTS,
+        kills = Score.KILLS, deaths = Score.PENALTY_BAR, aggro = Score.PENALTY_BAR }
 end
 
 -- Index of the best score (the first one on a tie), or nil without rows.
@@ -88,19 +104,20 @@ function Score.Short(value, format)
     return pattern:format(text)
 end
 
--- Example values for /pcomp test (the owner's design, 2026-10-19), in classic dungeon sizes.
+-- Example values for /pcomp test (the owner's design, 2026-10-19), in classic dungeon sizes; level and class
+-- (classFile: the client names it) since the owner's wish of 2026-10-19.
 function Score.Sample()
     return {
-        { name = "Arden", role = "TANK", done = 18400, taken = 41200, heal = 3200, interrupts = 14, kills = 9,
-            deaths = 0, aggro = 0 },
-        { name = "Mira", role = "HEALER", done = 4800, taken = 6100, heal = 32600, interrupts = 2, kills = 1,
-            deaths = 0, aggro = 1 },
-        { name = "Kael", role = "DAMAGER", done = 29700, taken = 9800, heal = 800, interrupts = 9, kills = 17,
-            deaths = 1, aggro = 2 },
-        { name = "Nyra", role = "DAMAGER", done = 31200, taken = 5200, heal = 1100, interrupts = 11, kills = 21,
-            deaths = 0, aggro = 0 },
-        { name = "Korr", role = "DAMAGER", done = 26500, taken = 14300, heal = 600, interrupts = 7, kills = 12,
-            deaths = 2, aggro = 3 },
+        { name = "Arden", role = "TANK", level = 60, classFile = "WARRIOR",
+            done = 18400, taken = 41200, heal = 3200, interrupts = 14, kills = 9, deaths = 0, aggro = 0 },
+        { name = "Mira", role = "HEALER", level = 60, classFile = "PRIEST",
+            done = 4800, taken = 6100, heal = 32600, interrupts = 2, kills = 1, deaths = 0, aggro = 1 },
+        { name = "Kael", role = "DAMAGER", level = 59, classFile = "MAGE",
+            done = 29700, taken = 9800, heal = 800, interrupts = 9, kills = 17, deaths = 1, aggro = 2 },
+        { name = "Nyra", role = "DAMAGER", level = 60, classFile = "ROGUE",
+            done = 31200, taken = 5200, heal = 1100, interrupts = 11, kills = 21, deaths = 0, aggro = 0 },
+        { name = "Korr", role = "DAMAGER", level = 58, classFile = "HUNTER",
+            done = 26500, taken = 14300, heal = 600, interrupts = 7, kills = 12, deaths = 2, aggro = 3 },
     }
 end
 
