@@ -2,6 +2,8 @@
 
 Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed, Removed, Known Issues.
 ### Fixed
+- A member's changed role, class or level during a run is now taken over (owner 2026-10-19: the healer change was
+  not shown); before, the first reading stayed.
 - A wipe was not counted when your own death ended combat before the last member died (owner 2026-10-19): it
   now belongs to the last fight if that ended at most 60 seconds earlier.
 - Group result: always the portrait, no 3D character (owner 2026-10-19: the 3D figure came and went).

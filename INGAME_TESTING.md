@@ -64,6 +64,11 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   - ❌ FAIL 2026-10-19 (Owner: alle tot, kein Wipe angezeigt — dein Tod beendet den Kampf vor dem letzten Tod)
   - 🔧 FIX IMPLEMENTED 2026-10-19 (Wipe gehört zum letzten Kampf, wenn er höchstens 60 s vorher endete)
   - MANUAL RETEST REQUIRED
+- [ ] PT-CHRON-028 Im Run wechselt der Heiler (oder seine Rolle): der Bericht zeigt den neuen Heiler mit Klasse, Stufe
+  und Rolle „Heiler“ an zweiter Stelle
+  - ❌ FAIL 2026-10-19 (Owner: Wechsel der Heiler-Klasse nicht übernommen)
+  - 🔧 FIX IMPLEMENTED 2026-10-19 (die neueste Angabe gilt; „keine Rolle“ ersetzt keine bekannte)
+  - MANUAL RETEST REQUIRED
 
 ## Run-Bericht
 

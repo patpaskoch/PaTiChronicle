@@ -43,8 +43,10 @@ function Run.AddMember(run, member)
         entry = { name = member.name }
         run.members[member.name] = entry
     end
+    -- The latest reading wins (owner 2026-10-19: a changed healer was not taken over); an unknown role ("NONE",
+    -- e.g. not assigned yet) never replaces a known one.
     for key, value in pairs(member) do
-        if entry[key] == nil then entry[key] = value end
+        if not (key == "role" and value == "NONE" and entry.role) then entry[key] = value end
     end
 end
 

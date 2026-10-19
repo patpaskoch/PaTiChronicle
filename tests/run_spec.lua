@@ -123,6 +123,16 @@ describe("Run events", function()
         assert.is_true(run.data.deathsSecret)
     end)
 
+    it("a member's newer role, class and level replace the old ones; an unknown role keeps the known one", function()
+        local Run = load()
+        local run = newRun(Run)
+        Run.AddMember(run, { name = "Mira", role = "DAMAGER", level = 19 })
+        Run.AddMember(run, { name = "Mira", role = "HEALER", level = 20, classFile = "PRIEST" })
+        Run.AddMember(run, { name = "Mira", role = "NONE" })
+        assert.same({ "HEALER", 20, "PRIEST" }, { run.members.Mira.role, run.members.Mira.level,
+            run.members.Mira.classFile })
+    end)
+
     it("a wipe still counts when your own death ended combat first, but not long after the fight", function()
         local Run = load()
         local run = newRun(Run)
