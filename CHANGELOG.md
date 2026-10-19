@@ -25,6 +25,8 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
   `/pcomp test` switches the example values on and off. Commands `hide`, `lock`, `unlock`, `settings`; `reset` now
   moves the window back to its default position (as everywhere), `clear` clears the test results.
 
+- End screen: the score also as a bar 0–100 under the number (role colour, gold for the best; owner 2026-10-19).
+
 ### Removed
 - The combat log is no longer read (owner screenshot 2026-10-19: "PaTiCompetition wurde geblockt"): this client
   reserves `COMBAT_LOG_EVENT_UNFILTERED` for the Blizzard UI. The test run now checks for `C_DamageMeter` instead.

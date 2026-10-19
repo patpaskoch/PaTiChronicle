@@ -8,12 +8,14 @@ ns.Results = Results
 
 local MAX_CARDS = 5 -- a party
 local PAD, GAP = UI.Spacing.LG, UI.Spacing.MD
-local CARD_WIDTH, CARD_HEIGHT = 150, 404
+local CARD_WIDTH, CARD_HEIGHT = 150, 420
 local PORTRAIT = 72 -- portrait edge; the role frame around it is ROLE_FRAME wider on each side
 local ROLE_FRAME = 3
 local STAT_HEIGHT = 30 -- icon row: label on top, value below
 local STAT_ICON = 22
 local TITLE_HEIGHT = 52 -- big title + subtitle above the cards
+local SCORE_BAR = 6 -- the score as a bar 0-100 under the number (owner 2026-10-19)
+local SCORE_BAR_WIDTH = CARD_WIDTH - 2 * UI.Spacing.MD
 local WIDTH = 2 * PAD + MAX_CARDS * CARD_WIDTH + (MAX_CARDS - 1) * GAP
 local HEIGHT = UI.Sizes.HeaderHeight + TITLE_HEIGHT + CARD_HEIGHT + 2 * PAD
 
@@ -126,11 +128,18 @@ for index = 1, MAX_CARDS do
     separator(card, y - UI.Spacing.XS)
 
     card.scoreLabel = card:CreateFontString(nil, "OVERLAY", UI.Fonts.Label)
-    card.scoreLabel:SetPoint("BOTTOM", 0, 38)
+    card.scoreLabel:SetPoint("BOTTOM", 0, 50)
     UI.Paint(card.scoreLabel, "SetTextColor", "TextMuted")
     UI.BindText(card.scoreLabel, "SCORE")
     card.score = card:CreateFontString(nil, "OVERLAY", FONT_SCORE)
-    card.score:SetPoint("BOTTOM", 0, UI.Spacing.MD + UI.Spacing.XS)
+    card.score:SetPoint("BOTTOM", 0, UI.Spacing.MD + UI.Spacing.XS + SCORE_BAR + UI.Spacing.SM)
+    card.barBack = card:CreateTexture(nil, "ARTWORK")
+    card.barBack:SetSize(SCORE_BAR_WIDTH, SCORE_BAR)
+    card.barBack:SetPoint("BOTTOM", 0, UI.Spacing.MD)
+    UI.Paint(card.barBack, "SetColorTexture", "PanelHover")
+    card.bar = card:CreateTexture(nil, "OVERLAY")
+    card.bar:SetHeight(SCORE_BAR)
+    card.bar:SetPoint("LEFT", card.barBack, "LEFT")
     cards[index] = card
 end
 
@@ -152,6 +161,11 @@ local function fillCard(card, row, isBest, format)
     end
     card.score:SetText(L.SCORE_VALUE:format(row.score or 0))
     UI.Paint(card.score, "SetTextColor", isBest and "Accent" or "Text")
+    -- A texture cannot be 0 wide: an empty bar is hidden instead.
+    local filled = math.max(0, math.min(100, row.score or 0)) / 100
+    card.bar:SetWidth(math.max(1, SCORE_BAR_WIDTH * filled))
+    card.bar:SetShown(filled > 0)
+    UI.Paint(card.bar, "SetColorTexture", isBest and "Accent" or ROLE_COLOR[role] or "TextMuted")
     UI.Paint(card, "SetBackdropBorderColor", isBest and "Accent" or "Border")
     UI.Paint(card, "SetBackdropColor", isBest and "PanelHover" or "Panel")
     card:Show()

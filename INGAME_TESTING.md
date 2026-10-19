@@ -43,6 +43,7 @@ Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github
   seinem Namen „Aggro gezogen 1“ (oder mehr) und seine Rolle; beim Tank zählt es auch
   (gibt später aber keine Minuspunkte)
 
+
 ## Einstellungen und Testmodus
 
 - [ ] PT-COMP-030 ••• → Einstellungen (oder `/pcomp settings`): Fenster „PaTiCompetition Einstellungen“ mit Sprache,
@@ -69,3 +70,5 @@ Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github
   (Rückmeldung zur Formel)
 - ~~PT-COMP-025 Unterbrechungen und Todesstöße werden gezählt: Werte auf der Karte und bei `/pcomp probe`~~
   - RETIRED 2026-10-19 – kamen aus dem Kampflog (der Blizzard-UI vorbehalten)
+- [ ] PT-COMP-026 Unter der Wertung ein Balken: so lang wie die Wertung (91 / 100 = fast voll), in Rollenfarbe, bei der
+  besten Wertung gold; Wertung 0 = leerer Balken; nichts überlappt mit „WERTUNG“ oder der Zahl
