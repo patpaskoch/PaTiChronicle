@@ -20,8 +20,8 @@ Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github
 ## Installation / Laden
 
 - [ ] PT-COMP-001 Login ohne Lua-Fehler; PaTiCompetition erscheint in der AddOn-Liste mit Beschreibung
-  ❌ FAIL 2026-10-19 – Fenster „PaTiCompetition wurde geblockt … der Blizzard-UI vorbehalten“ (Kampflog)
-  🔧 FIX IMPLEMENTED 2026-10-19 – Kampflog wird nicht mehr angemeldet · MANUAL RETEST REQUIRED
+  - ❌ FAIL 2026-10-19 – Fenster „PaTiCompetition wurde geblockt … der Blizzard-UI vorbehalten“ (Kampflog)
+  - 🔧 FIX IMPLEMENTED 2026-10-19 – Kampflog wird nicht mehr angemeldet · MANUAL RETEST REQUIRED
 - [ ] PT-COMP-002 `/reload` ohne Lua-Fehler; `/pcomp` zeigt die Hilfe, `/pcomp version` die Version 0.1.0
 - [ ] PT-COMP-003 Login und `/reload`: kein Fenster „PaTiCompetition wurde geblockt“
 
