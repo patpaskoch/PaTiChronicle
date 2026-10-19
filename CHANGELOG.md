@@ -20,5 +20,10 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 - Interrupts (`SPELL_INTERRUPT`) and killing blows (`PARTY_KILL`, owner question 2026-10-19) per member; a new run
   starts the totals from zero.
 
+### Removed
+- The combat log is no longer read (owner screenshot 2026-10-19: "PaTiCompetition wurde geblockt"): this client
+  reserves `COMBAT_LOG_EVENT_UNFILTERED` for the Blizzard UI. The test run now checks for `C_DamageMeter` instead.
+
 ### Known Issues
+- No source for damage, healing, damage taken, interrupts, killing blows and deaths yet: they show 0.
 - The clock does not stop at the end boss yet; the end screen opens only by command.

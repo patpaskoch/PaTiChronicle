@@ -1,13 +1,13 @@
 -- PaTiCompetition 0.1.0: the probe. Before the dungeon competition (run clock, end screen with damage, damage taken,
--- healing and a score) is built, this finds out what the WoW Forever client really delivers: the combat log, its
--- numbers in combat (secret or readable) and the boss fight events. Display only: nothing is cast, targeted or sent.
+-- healing and a score) is built, this finds out what the WoW Forever client really delivers: a source for the
+-- numbers (the combat log is reserved for the Blizzard UI here) and the boss fight events.
+-- Display only: nothing is cast, targeted or sent.
 -- Results stay in PaTiCompetitionDB.probe (SavedVariables) and are shown with /pcomp probe.
 local addonName, ns = ...
 local UI, L, Logic, Score, Results = ns.UI, ns.UI.L, ns.Logic, ns.Score, ns.Results
 
 local DB
 local window = Results.window -- the end screen (Results.lua)
-local members = {} -- { [guid] = name }: player, party and their pets (a pet counts for its owner)
 local memberUnits = {} -- { [unit] = name }: player and party (whose threat status is watched)
 local threatStatus = {} -- { [unit] = last UnitThreatSituation }, runtime only
 
@@ -33,40 +33,31 @@ local function currentInstance()
     return ("%s (%s)"):format(tostring(name), tostring(id))
 end
 
-local function addMember(unit, ownerUnit)
-    if not UnitExists or not flag(UnitExists(unit)) or not UnitGUID or not UnitName then return end
-    local guid, name = UnitGUID(unit), UnitName(ownerUnit or unit)
-    if guid and name and not isSecret(guid) and not isSecret(name) then
-        members[guid] = name
-        if not ownerUnit then memberUnits[unit] = name end
-    end
+local function addMember(unit)
+    if not UnitExists or not flag(UnitExists(unit)) or not UnitName then return end
+    local name = UnitName(unit)
+    if name and not isSecret(name) then memberUnits[unit] = name end
 end
 
 local function readMembers()
-    members, memberUnits = {}, {}
-    addMember("player"); addMember("pet", "player")
-    for index = 1, 4 do addMember("party" .. index); addMember("partypet" .. index, "party" .. index) end
+    memberUnits = {}
+    addMember("player")
+    for index = 1, 4 do addMember("party" .. index) end
 end
 
 -- Events ---------------------------------------------------------------------------------------------------------
 
 -- Events that may not exist in this client: RegisterEvent raises an error for unknown names, so each is tried once.
-local OPTIONAL = { "COMBAT_LOG_EVENT_UNFILTERED", "ENCOUNTER_START", "ENCOUNTER_END", "BOSS_KILL",
-    "UNIT_THREAT_SITUATION_UPDATE" }
+-- Never COMBAT_LOG_EVENT_UNFILTERED: this client reserves it for the Blizzard UI; registering it shows the
+-- "blocked" popup (ADDON_ACTION_FORBIDDEN, owner 2026-10-19), which pcall does not prevent.
+local OPTIONAL = { "ENCOUNTER_START", "ENCOUNTER_END", "BOSS_KILL", "UNIT_THREAT_SITUATION_UPDATE" }
 local registered = {}
 local events = CreateFrame("Frame")
-for _, event in ipairs({ "PLAYER_LOGIN", "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE", "UNIT_PET",
+for _, event in ipairs({ "PLAYER_LOGIN", "PLAYER_ENTERING_WORLD", "GROUP_ROSTER_UPDATE",
     "PLAYER_REGEN_DISABLED" }) do
     events:RegisterEvent(event)
 end
 for _, event in ipairs(OPTIONAL) do registered[event] = pcall(events.RegisterEvent, events, event) end
-
-local function onCombatLog(...)
-    local entry
-    if CombatLogGetCurrentEventInfo then entry = Logic.Parse(isSecret, CombatLogGetCurrentEventInfo())
-    else entry = Logic.Parse(isSecret, ...) end -- older clients pass the entry as the event's arguments
-    Logic.Record(DB.probe, entry, members)
-end
 
 -- UnitThreatSituation(unit) without an enemy: the highest status against any enemy (nil out of combat).
 local function onThreat(unit)
@@ -97,6 +88,8 @@ end
 local function noteClient(probe)
     for _, name in ipairs(OPTIONAL) do probe.events[name] = registered[name] == true end
     probe.events.CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo ~= nil
+    -- Blizzard's own damage meter data (Retail 12.0) as a possible source: only whether it exists, nothing is called.
+    probe.events.C_DamageMeter = C_DamageMeter ~= nil
     probe.events.issecretvalue = issecretvalue ~= nil
     probe.client = GetBuildInfo and ("%s / %s"):format(tostring((GetBuildInfo())), tostring(select(4, GetBuildInfo())))
         or "?"
@@ -113,9 +106,7 @@ events:SetScript("OnEvent", function(_, event, ...)
         return
     end
     if not DB then return end
-    if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-        onCombatLog(...)
-    elseif event == "ENCOUNTER_START" or event == "ENCOUNTER_END" or event == "BOSS_KILL" then
+    if event == "ENCOUNTER_START" or event == "ENCOUNTER_END" or event == "BOSS_KILL" then
         onEncounter(event, ...)
     elseif event == "UNIT_THREAT_SITUATION_UPDATE" then
         onThreat(...)
@@ -179,7 +170,7 @@ local function printProbe()
     local probe = DB.probe
     say("PROBE_HEADER", tostring(probe.client))
     local seen = probe.events
-    say("PROBE_EVENTS", yesNo(seen.COMBAT_LOG_EVENT_UNFILTERED), yesNo(seen.CombatLogGetCurrentEventInfo),
+    say("PROBE_EVENTS", yesNo(seen.C_DamageMeter), yesNo(seen.CombatLogGetCurrentEventInfo),
         yesNo(seen.issecretvalue))
     say("PROBE_BOSS_EVENTS", yesNo(seen.ENCOUNTER_START), yesNo(seen.ENCOUNTER_END), yesNo(seen.BOSS_KILL))
     local log = probe.combatLog

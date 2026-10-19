@@ -7,12 +7,13 @@ Addon facts: `../../PaTiAdmin/docs/ARCHITECTURE.md` · open issues: `../../PaTiA
 - Purpose: dungeon competition — run clock until the end boss, end screen with damage, damage taken, healing, pulled
   aggro and a score per member (pulled aggro: minus points except for the tank).
   **Display only:** never casts, targets, marks or sends anything; no addon messages.
-- 0.1.0 = the test run (probe): what the Forever client delivers (combat log, secret values, boss fight events).
+- 0.1.0 = the test run (probe): what the Forever client delivers (damage meter API, boss fight events, threat).
   Build the clock window and the end screen only on what the probe confirmed (docs/WOW_API_COMPAT.md).
 - Files: `Logic.lua` (combat-log parsing, totals, run clock, migration; pure, tested) · `Score.lua` (tank, score,
   card order, short numbers, example values; pure, tested) · `Results.lua` (end screen window) · `PaTiCompetition.lua`
   (adapters, events, commands) · `Locales/` · `Shared/` (PaTiShared, synced — never edit).
-- Hot path: `COMBAT_LOG_EVENT_UNFILTERED` — keep `Logic.Parse` / `Logic.Record` cheap (no string building, no UI).
+- **Never register `COMBAT_LOG_EVENT_UNFILTERED`:** this client reserves it for the Blizzard UI (forbidden popup,
+  owner 2026-10-19; pcall does not help). `Logic.Parse` / `Logic.Record` stay for a later source of the same numbers.
 - Secret values: an entry with a secret field is only counted (`combatLog.secret`), never added up or printed.
 - SavedVariables: `PaTiCompetitionDB` (per character), schema 1 — `probe` (see `Logic.NewProbe`). Any shape change:
   bump `Logic.SCHEMA`, add a migration step and a test.

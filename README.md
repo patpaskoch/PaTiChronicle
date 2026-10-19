@@ -9,14 +9,13 @@ damage meter: the group plays against its own best time and compares who did bes
 > does not stop at the end boss yet. Not yet tested in game.
 
 ## What 0.1.0 does
-- Counts the combat log: how many entries arrive, how many have readable numbers and how many are secret
-- Adds up damage done, damage taken, healing (without overhealing), deaths, interrupts and killing blows for you,
-  your party and the pets
+- Checks whether the client offers Blizzard's damage meter data (`C_DamageMeter`). The combat log is reserved for
+  the Blizzard UI in this client, so damage, healing, damage taken, interrupts, killing blows and deaths stay 0 for
+  now (owner test 2026-10-19)
 - Counts pulled aggro per member: an enemy turns to them (threat status rises to 2 or more), with their role
 - Notes whether the client sends boss fight events (start, end, kill) and with which boss number
 - Starts a clock with the first fight inside an instance; boss fights are timed from there
 - A new run (another instance) starts the totals from zero
-- Keeps the last 40 enemy deaths with their NPC number (to build the list of end bosses later)
 - Shows nothing by itself except a chat line when the clock starts and when a boss fight ends.
   Nothing is cast, targeted or sent to others
 
@@ -55,8 +54,8 @@ Overview of all addons: [PaTiAdmin](https://github.com/patpaskoch/PaTiAdmin).
 `probe` (test results in the chat) · `reset` (clear and start again) · `version`
 
 ## Known limitations
-- Test run only: no window, no end screen, no score yet.
-- Only what this client sees: members far away may miss entries (WoW's combat log range).
+- No source for damage, healing, interrupts, killing blows and deaths yet: the combat log is reserved for the Blizzard
+  UI here. The end screen shows these as 0; only pulled aggro is counted.
 - No icon yet.
 
 ## Development
