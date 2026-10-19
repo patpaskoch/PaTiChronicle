@@ -54,7 +54,7 @@ frame:SetScript("OnUpdate", function(_, delta)
 end)
 
 frame:SetScript("OnDragStart", function(self)
-    if db and not db.locked then self:StartMoving() end
+    if db and not db.locked then self.dragged = true; self:StartMoving() end
 end)
 frame:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
@@ -62,8 +62,12 @@ frame:SetScript("OnDragStop", function(self)
     local point, _, relativePoint, x, y = self:GetPoint()
     db.hud = { point = point, relativePoint = relativePoint, x = x, y = y }
 end)
+-- Left click: the run report (owner 2026-10-19); right click: the menu. A drag is not a click.
 frame:SetScript("OnMouseUp", function(self, button)
-    if button == "RightButton" and state and state.menu then UI.ShowPopup(self, state.menu(), 180, "RIGHT") end
+    if not state then return end
+    if button == "RightButton" and state.menu then UI.ShowPopup(self, state.menu(), 180, "RIGHT")
+    elseif button == "LeftButton" and not self.dragged and state.open then state.open() end
+    self.dragged = nil
 end)
 UI.SetTooltip(frame, "HUD_TIP")
 UI.OnThemeChanged(function() frame:SetBackdropColor(UI.Color("Background")) end)

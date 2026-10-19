@@ -6,7 +6,13 @@ ns.Locales.deDE = L
 
 L.YES = "ja"
 L.NO = "nein"
-L.HELP = "/pchron show, hide, test, lock, unlock, reset, settings, end, abort, hud, probe, clear, version"
+L.HELP = "/pchron show, hide, test, lock, unlock, reset, settings, end, abort, hud, minimap, probe, clear, version"
+L.CMD_MINIMAP = "Minimap-Knopf ein/aus"
+L.SHOW_MINIMAP = "Minimap-Knopf zeigen"
+L.HIDE_MINIMAP = "Minimap-Knopf ausblenden"
+L.MINIMAP_TIP = "Linksklick: Run-Bericht · Rechtsklick: Menü · Ziehen: verschieben"
+L.MINIMAP_HIDDEN = "Minimap-Knopf ausgeblendet. /pchron minimap oder die Einstellungen holen ihn zurück."
+L.BINDING_TOGGLE = "Run-Bericht ein/aus"
 L.CMD_END = "laufenden Run beenden: Endboss besiegt"
 L.CMD_ABORT = "laufenden Run abbrechen (wird nicht gespeichert)"
 L.CMD_HUD = "Run-Uhr ein/aus"
@@ -44,7 +50,7 @@ L.HIDE_HUD = "Run-Uhr ausblenden"
 L.HUD_READY = "bereit – die Uhr startet mit dem ersten Kampf"
 L.HUD_DONE = "geschafft in %s"
 L.HUD_BEST = "Bestzeit %s"
-L.HUD_TIP = "Run-Uhr. Rechtsklick: Run beenden, abbrechen, Bericht. Ziehen zum Verschieben."
+L.HUD_TIP = "Run-Uhr. Linksklick: Run-Bericht · Rechtsklick: Run beenden, abbrechen · Ziehen: verschieben"
 L.SAMPLE_DUNGEON = "Die Todesminen"
 
 -- Report

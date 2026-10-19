@@ -1,0 +1,6 @@
+<Bindings>
+    <!-- Shown under "PaTiChronicle" in WoW's key binding menu. PaTiChronicle never binds a key by itself. -->
+    <Binding name="PATICHRONICLE_TOGGLE" header="PATICHRONICLE" category="BINDING_HEADER_PATICHRONICLE">
+        PaTiChronicle_Toggle()
+    </Binding>
+</Bindings>

@@ -6,7 +6,13 @@ ns.Locales.enUS = L
 
 L.YES = "yes"
 L.NO = "no"
-L.HELP = "/pchron show, hide, test, lock, unlock, reset, settings, end, abort, hud, probe, clear, version"
+L.HELP = "/pchron show, hide, test, lock, unlock, reset, settings, end, abort, hud, minimap, probe, clear, version"
+L.CMD_MINIMAP = "minimap button on / off"
+L.SHOW_MINIMAP = "Show the minimap button"
+L.HIDE_MINIMAP = "Hide minimap button"
+L.MINIMAP_TIP = "Left click: run report · right click: menu · drag: move"
+L.MINIMAP_HIDDEN = "minimap button hidden. /pchron minimap or the settings bring it back."
+L.BINDING_TOGGLE = "Run report on / off"
 L.CMD_END = "end the running run: end boss defeated"
 L.CMD_ABORT = "abort the running run (not saved)"
 L.CMD_HUD = "run clock line on / off"
@@ -44,7 +50,7 @@ L.HIDE_HUD = "Hide run clock"
 L.HUD_READY = "ready – the clock starts with the first fight"
 L.HUD_DONE = "done in %s"
 L.HUD_BEST = "best %s"
-L.HUD_TIP = "Run clock. Right click: end run, abort, report. Drag to move."
+L.HUD_TIP = "Run clock. Left click: run report · right click: end run, abort · drag: move"
 L.SAMPLE_DUNGEON = "The Deadmines"
 
 -- Report

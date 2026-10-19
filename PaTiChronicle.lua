@@ -201,7 +201,8 @@ refresh = function()
     local run = DB.run
     local last = DB.report and DB.report.run
     if not run and last and last.key == instance.key and last.state == "completed" then run = last end
-    Hud.Update({ name = instance.name, run = run, best = Chronicle.BestTime(DB, instance.key), menu = function()
+    Hud.Update({ name = instance.name, run = run, best = Chronicle.BestTime(DB, instance.key),
+        open = function() setShown(not window:IsShown()) end, menu = function()
         local items = {}
         if DB.run then
             items[#items + 1] = { text = "END_RUN", onClick = function() finishRun("manual") end }
@@ -332,6 +333,7 @@ events:SetScript("OnEvent", function(_, event, ...)
         noteClient(DB.probe)
         readMembers()
         if DB.run and not Run.Login(DB.run, time()) then abortRun("logout") end
+        if ns.OnLogin then ns.OnLogin() end -- Settings.lua: minimap button
         return
     end
     if not DB then return end

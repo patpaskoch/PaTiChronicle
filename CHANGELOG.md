@@ -34,6 +34,12 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 - The end screen with five player cards, seven values, points per value and the score 0–100 (`Score.lua`,
   `Results.lua`); the combat-log parser.
 
+### Added
+- Ways to open the run report (owner 2026-10-19: "tedious"): a minimap button (left click: report on / off, right
+  click: the menu, drag: move around the minimap; setting "Show the minimap button", `/pchron minimap`), a key
+  binding "Run report on / off" in WoW's key binding menu (nothing is bound automatically), and a left click on the
+  run clock line.
+
 ### Changed
 - Redesign of the run report (owner approval 2026-10-19): a game results screen instead of a dashboard. Four tabs as
   text tabs with an accent underline — Overview, **Group result** (new), My performance, Timeline. Five type levels

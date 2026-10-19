@@ -20,6 +20,8 @@ Logic.DEFAULTS = {
     showHud = true, -- the run clock line inside a dungeon
     openReport = true, -- open the run report when a run ends
     myRole = "AUTO",
+    showMinimap = true, -- the minimap button (owner 2026-10-19)
+    minimapAngle = 220, -- degrees around the minimap, 0 = right, counter-clockwise
 }
 
 -- The probe answers the open API questions (docs/WOW_API_COMPAT.md, tests T1–T7 in INGAME_TESTING.md).
@@ -56,6 +58,10 @@ function Logic.Migrate(db)
         if not isList(db[key]) then db[key] = {} end
     end
     if db.run ~= nil and (not isList(db.run) or db.run.state ~= "running") then db.run = nil end
+    if type(db.minimapAngle) ~= "number" or db.minimapAngle ~= db.minimapAngle then
+        db.minimapAngle = Logic.DEFAULTS.minimapAngle
+    end
+    db.minimapAngle = db.minimapAngle % 360
     if db.groupCategory ~= "survival" and db.groupCategory ~= "contribution" then db.groupCategory = "survival" end
     if db.report ~= nil and (not isList(db.report) or not isList(db.report.run)) then db.report = nil end
     db.schema = Logic.SCHEMA
@@ -84,6 +90,16 @@ function Logic.RecordRead(probe, kind, secret, party)
     local entry = probe[kind]
     if secret then entry.secret = entry.secret + 1 else entry.readable = entry.readable + 1 end
     if party and kind == "threat" then entry.party = entry.party + 1 end
+end
+
+-- Minimap button: the offset from the minimap centre for an angle (degrees) and radius, and back.
+function Logic.MinimapOffset(angle, radius)
+    local rad = math.rad(angle or Logic.DEFAULTS.minimapAngle)
+    return math.cos(rad) * radius, math.sin(rad) * radius
+end
+
+function Logic.MinimapAngle(dx, dy)
+    return math.deg(math.atan2(dy, dx)) % 360
 end
 
 -- 754 → "12:34", 3725 → "1:02:05", nil → "-".

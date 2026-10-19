@@ -31,6 +31,10 @@ local function buildSettings()
         get = function() return DB.showHud end,
         set = function(shown) DB.showHud = shown; C.refresh() end,
     }))
+    modal:AddControls(UI.CreateCheckbox(modal, "SHOW_MINIMAP", {
+        get = function() return DB.showMinimap end,
+        set = function(shown) DB.showMinimap = shown; ns.MinimapButton.Refresh() end,
+    }))
     modal:AddControls(UI.CreateCheckbox(modal, "OPEN_REPORT_AT_END", {
         get = function() return DB.openReport end,
         set = function(open) DB.openReport = open end,
@@ -48,6 +52,7 @@ local function buildSettings()
         window:SetLocked(DB.locked)
         window:SetScale(DB.scale)
         C.refresh()
+        ns.MinimapButton.Refresh()
     end)
 end
 
@@ -125,6 +130,11 @@ local COMMANDS = {
     ["end"] = function() if C.db().run then C.finishRun("manual") else C.say("NO_RUN") end end,
     abort = function() if C.db().run then C.abortRun("click") else C.say("NO_RUN") end end,
     hud = function() local DB = C.db(); DB.showHud = not DB.showHud; C.refresh() end,
+    minimap = function()
+        local DB = C.db()
+        DB.showMinimap = not DB.showMinimap
+        ns.MinimapButton.Refresh()
+    end,
     probe = printProbe,
     clear = function()
         C.db().probe = Logic.NewProbe()
@@ -133,6 +143,30 @@ local COMMANDS = {
     end,
     version = function() C.say("VERSION", C.version()) end,
 }
+
+-- Key binding (Bindings.xml): shown in WoW's key binding menu; nothing is bound automatically.
+local G = _G
+G.BINDING_HEADER_PATICHRONICLE = "PaTiChronicle"
+G.BINDING_NAME_PATICHRONICLE_TOGGLE = L.BINDING_TOGGLE
+function PaTiChronicle_Toggle()
+    if C.db() then C.setShown(not window:IsShown()) end
+end
+
+-- Minimap button: left click = the report, right click = the same menu as the window (+ hide the button).
+ns.OnLogin = function()
+    ns.MinimapButton.Attach(C.db(), {
+        toggle = PaTiChronicle_Toggle,
+        menu = function()
+            local items = window.getMenuItems and window.getMenuItems() or {}
+            items[#items + 1] = { text = "HIDE_MINIMAP", onClick = function()
+                C.db().showMinimap = false
+                ns.MinimapButton.Refresh()
+                C.say("MINIMAP_HIDDEN")
+            end }
+            return items
+        end,
+    })
+end
 
 SLASH_PATICHRONICLE1 = "/patichronicle"
 SLASH_PATICHRONICLE2 = "/pchron"

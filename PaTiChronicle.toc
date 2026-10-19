@@ -19,5 +19,6 @@ ReportMine.lua
 ReportTimeline.lua
 Hud.lua
 Probe.lua
+Minimap.lua
 PaTiChronicle.lua
 Settings.lua

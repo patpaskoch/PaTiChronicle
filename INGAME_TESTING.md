@@ -105,6 +105,18 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 - [ ] PT-CHRON-068 Alle vier Farbschemata (Standard, WoForever, Dracula, Soft Fantasy): alles lesbar, getönte
   Tabellenzeilen sichtbar; Soft Fantasy bleibt nach `/reload` gewählt
 
+## Öffnen (Minimap-Knopf, Taste, Run-Uhr)
+
+- [ ] PT-CHRON-070 Minimap-Knopf mit Buch-Symbol am Rand der Minimap; Linksklick blendet den Run-Bericht ein/aus;
+  Tooltip „Linksklick: Run-Bericht · Rechtsklick: Menü · Ziehen: verschieben“
+- [ ] PT-CHRON-071 Rechtsklick: Menü (Einstellungen, Testmodus, … , „Minimap-Knopf ausblenden“); Ausblenden → Chat-Hinweis;
+  `/pchron minimap` und die Einstellung „Minimap-Knopf zeigen“ holen ihn zurück
+- [ ] PT-CHRON-072 Knopf um die Minimap ziehen; Position bleibt nach `/reload`
+- [ ] PT-CHRON-073 WoW-Tastenbelegung → „PaTiChronicle“ → „Run-Bericht ein/aus“: eine Taste zuweisen, sie blendet den
+  Bericht ein/aus (das Addon belegt selbst keine Taste)
+- [ ] PT-CHRON-074 Im Dungeon: Linksklick auf die Run-Uhr öffnet den Bericht; Ziehen verschiebt sie, ohne den Bericht
+  zu öffnen; Rechtsklick zeigt das Menü
+
 ## Run-Uhr
 
 - [ ] PT-CHRON-040 Nur in 5er-Dungeons sichtbar; Zeit läuft jede Sekunde; Bestzeit rechts daneben

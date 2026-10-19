@@ -57,6 +57,12 @@ reason in the tooltip). Always positive; nothing is put on another player. The r
 An **aggro moment**: an enemy attacks a non-tank for at least 3 seconds without a break (threat status 2 or 3).
 Your role: the group role, or "My role" in the settings. Without a known tank the others' moments are not counted.
 
+## Opening the report
+- **Minimap button** (book): left click shows / hides the report, right click opens the menu, drag moves it. Off in the
+  settings or with `/pchron minimap`.
+- **Key binding:** WoW key bindings → PaTiChronicle → "Run report on / off" (PaTiChronicle never binds a key itself).
+- `/pchron`, the run clock (left click), or PaTiSuite.
+
 ## Run clock
 One quiet line inside a dungeon: dungeon, run time, best time. Right click: end run, abort, open the report, hide.
 Drag to move. Switch it off in the settings or with `/pchron hud`.
