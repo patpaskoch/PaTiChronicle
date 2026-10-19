@@ -102,7 +102,8 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   (nahe gleiche zusammengefasst mit „×2“); Liste mit sauber ausgerichteten Zeiten, Linie zwischen Kämpfen; rechts DETAIL
   mit dem ersten Tod (Kampf 10, Dauer, „Im selben Kampf: … Korr gestorben“)
 - [ ] PT-CHRON-067 Klick auf eine Zeile oder ein Symbol der Zeitleiste zeigt rechts dessen Details; die Zeile ist markiert
-- [ ] PT-CHRON-068 Alle drei Farbschemata (Standard, WoForever, Dracula): alles lesbar, getönte Tabellenzeilen sichtbar
+- [ ] PT-CHRON-068 Alle vier Farbschemata (Standard, WoForever, Dracula, Soft Fantasy): alles lesbar, getönte
+  Tabellenzeilen sichtbar; Soft Fantasy bleibt nach `/reload` gewählt
 
 ## Run-Uhr
 
