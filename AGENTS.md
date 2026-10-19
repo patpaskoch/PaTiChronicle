@@ -13,7 +13,8 @@ Addon facts: `../../PaTiAdmin/docs/ARCHITECTURE.md` · open issues: `../../PaTiA
 - Files: `Logic.lua` (settings, migration, probe, clock; pure) · `Run.lua` (run rules and events; pure) ·
   `Chronicle.lua` (history, best times, achievements, development; pure) · `Sample.lua` (example run through the
   same rules; pure) · `Report.lua` (window, tabs, building blocks, Overview) · `ReportGroup.lua` ·
-  `ReportMine.lua` · `ReportTimeline.lua` · `Hud.lua` (run clock line) · `Minimap.lua` (minimap button) · `Probe.lua` (read-only API probe) · `Bindings.xml`
+  `ReportMine.lua` · `ReportTimeline.lua` · `Hud.lua` (run clock line) · `Minimap.lua` (minimap button) ·
+  `Probe.lua` (read-only API probe) · `Bindings.xml`
   (key binding `PaTiChronicle_Toggle`) · `PaTiChronicle.lua` (adapters, events, runs) · `Settings.lua` (settings, menu,
   commands, probe output) · `Locales/` · `Shared/` (PaTiShared, synced — never edit). Tests: `tests/*_spec.lua`.
 - Rules live in the headers of `Run.lua` (start/end/abort/counted/without gaps) and `Chronicle.lua` (achievements);
