@@ -44,6 +44,11 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 - [ ] PT-CHRON-016 (T7) Ohne Rollenwahl: Reiter „Meine Leistung“ zeigt deine Rolle (oder „Keine Rolle“);
   Einstellung „Meine Rolle“ ändert sie für den nächsten Run
 
+- [ ] PT-CHRON-017 (T6a–d) Nach einem Kampf und noch einmal während eines Kampfes `/pchron probe`: Zeilen
+  „Schadensmesser verfügbar … Kategorien … Sitzungsarten …“, „Sitzungen“, „Nach einem Kampf“, „Während eines Kampfes“
+  – Ausgabe melden (enthält nur Feldnamen und „secret“, keine Zahlen)
+- [ ] PT-CHRON-018 (T9) `/pchron probe`: Zeile „3D-Figur: ok / …“ und welche Schriften „yes“ sind – melden
+
 ## Run
 
 - [ ] PT-CHRON-020 Dungeon betreten: Uhr-Zeile „<Dungeon> bereit …“; erster Kampf: Chat „Run gestartet“, Uhr läuft

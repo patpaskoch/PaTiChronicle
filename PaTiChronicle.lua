@@ -5,12 +5,13 @@
 -- settings and commands: Settings.lua.
 local addonName, ns = ...
 local UI, L, Logic, Run, Chronicle = ns.UI, ns.UI.L, ns.Logic, ns.Run, ns.Chronicle
-local Report, Hud, Sample = ns.Report, ns.Hud, ns.Sample
+local Report, Hud, Sample, Probe = ns.Report, ns.Hud, ns.Sample, ns.Probe
 
 local DB
 local window = Report.window
 local memberUnits = {} -- { [unit] = name }: player and party1-4
 local testMode = false -- runtime only: the report shows the example run
+local meterInCombat = false -- probe: look at C_DamageMeter once during the next fight (test T6c)
 
 local function say(key, ...)
     print("|cff68caffPaTiChronicle:|r " .. L[key]:format(...))
@@ -235,6 +236,7 @@ local function noteClient(probe)
         table.sort(names)
         probe.damageMeter = table.concat(names, ", ") -- only the function names; nothing is called (test T6)
     end
+    Probe.Client(probe)
     probe.client = GetBuildInfo and ("%s / %s"):format(tostring((GetBuildInfo())), tostring(select(4, GetBuildInfo())))
         or "?"
 end
@@ -259,6 +261,10 @@ local function onThreat(unit)
     local ok, status = pcall(UnitThreatSituation, unit)
     if not ok then return end
     Logic.RecordRead(DB.probe, "threat", isSecret(status), unit ~= "player")
+    if meterInCombat and InCombatLockdown and InCombatLockdown() then
+        meterInCombat = false
+        Probe.DamageMeter(DB.probe, true)
+    end
     if isSecret(status) then Run.Threat(run, name, nil, false, false, GetTime(), time()); return end
     local tank, mine = run.tank, unit == "player"
     -- Without a known tank the others' moments cannot be told apart from tanking: only yours count then.
@@ -306,6 +312,7 @@ local function onFightStart()
         say("RUN_STARTED", instance.name)
     end
     DB.probe.fights = DB.probe.fights + 1
+    meterInCombat = true
     noteMembers(DB.run)
     Run.FightStart(DB.run, now)
     for unit in pairs(memberUnits) do deathCheck(unit) end
@@ -338,7 +345,10 @@ events:SetScript("OnEvent", function(_, event, ...)
     elseif event == "PLAYER_REGEN_DISABLED" then
         onFightStart()
     elseif event == "PLAYER_REGEN_ENABLED" then
-        if DB.run then Run.FightEnd(DB.run, time(), GetTime()) end
+        if DB.run then
+            Run.FightEnd(DB.run, time(), GetTime())
+            Probe.DamageMeter(DB.probe, false)
+        end
     elseif event == "PLAYER_LOGOUT" then
         if DB.run then Run.Logout(DB.run, time()) end
     elseif event == "GROUP_ROSTER_UPDATE" then

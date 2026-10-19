@@ -87,6 +87,13 @@ local function printProbe()
     C.say("PROBE_EVENTS", yesNo(seen.ENCOUNTER_START), yesNo(seen.ENCOUNTER_END), yesNo(seen.BOSS_KILL),
         yesNo(seen.UNIT_THREAT_SITUATION_UPDATE))
     C.say("PROBE_DAMAGE_METER", probe.damageMeter or L.NO)
+    ns.Probe.DamageMeter(probe, InCombatLockdown and InCombatLockdown() or false)
+    local meter = probe.meter or {}
+    C.say("PROBE_METER", tostring(meter.available), tostring(meter.types), tostring(meter.sessionTypes))
+    C.say("PROBE_METER_SESSIONS", tostring(meter.sessions))
+    C.say("PROBE_METER_AFTER", tostring(meter.afterCombat))
+    C.say("PROBE_METER_DURING", tostring(meter.inCombat))
+    C.say("PROBE_MODEL", tostring(probe.model), tostring(probe.fonts))
     C.say("PROBE_THREAT", probe.threat.readable, probe.threat.secret, probe.threat.party)
     C.say("PROBE_DEATHS", probe.deaths.readable, probe.deaths.secret)
     C.say("PROBE_FIGHTS", probe.fights)

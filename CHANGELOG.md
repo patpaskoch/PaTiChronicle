@@ -23,6 +23,9 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
   "not checkable" with the reason.
 - Run clock line in dungeons (right click: end run, abort, report, hide). Settings: my role, show the run clock, open
   the report at the end. Commands `end`, `abort`, `hud`.
+- Probe, redesign step 1: what `C_DamageMeter` delivers (available, categories, session types, the fields of a
+  session and a player entry, readable or secret — after and during a fight; read only, never reset), whether a 3D
+  character (`PlayerModel`) works and which big fonts exist.
 - Probe: boss events, threat and death state readable or secret, fights, the function names of `C_DamageMeter`.
 
 ### Removed
