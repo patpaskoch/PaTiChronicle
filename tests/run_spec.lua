@@ -184,3 +184,20 @@ describe("Run events", function()
         assert.is_nil(Run.LastBoss(run, T + 600, 300))
     end)
 end)
+
+describe("Run meter (contribution)", function()
+    it("sums one snapshot per session; a session read again replaces itself; earlier sessions never count", function()
+        local Run = load()
+        local run = newRun(Run)
+        assert.is_nil(Run.MeterTotals(run))
+        Run.MeterStart(run, { [7] = true })
+        run.data.meter = true
+        Run.MeterSession(run, 7, { Kael = { damage = 999 } }) -- before the run
+        Run.MeterSession(run, 8, { Kael = { damage = 100, interrupts = 1 }, Mira = { healing = 50 } })
+        Run.MeterSession(run, 8, { Kael = { damage = 120, interrupts = 1 }, Mira = { healing = 60 } }) -- grew
+        Run.MeterSession(run, 9, { Kael = { damage = 30 } })
+        local totals = Run.MeterTotals(run)
+        assert.same({ 150, 1, 60, 2 }, { totals.Kael.damage, totals.Kael.interrupts, totals.Mira.healing,
+            run.meter.count })
+    end)
+end)

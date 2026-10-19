@@ -47,6 +47,9 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 - [ ] PT-CHRON-017 (T6a–d) Nach einem Kampf und noch einmal während eines Kampfes `/pchron probe`: Zeilen
   „Schadensmesser verfügbar … Kategorien … Sitzungsarten …“, „Sitzungen“, „Nach einem Kampf“, „Während eines Kampfes“
   – Ausgabe melden (enthält nur Feldnamen und „secret“, keine Zahlen)
+  - Probe 2026-10-19 aus den SavedVariables gelesen (Halle der Thanen, 31 Kämpfe): nach dem Kampf alle Werte lesbar,
+    im Kampf secret; Kategorien u. a. DamageDone, HealingDone, Interrupts, Dispels → Beitrag gebaut (PT-CHRON-075–077).
+    Box offen, bis der Owner es bestätigt
 - [ ] PT-CHRON-018 (T9) `/pchron probe`: Zeile „3D-Figur: ok / …“ und welche Schriften „yes“ sind – melden
 
 ## Run
@@ -102,7 +105,7 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 - [ ] PT-CHRON-063 Gruppenergebnis: fünf Mitglieder nebeneinander als Porträt (keine 3D-Figur),
   Name, Klasse mit Stufe, Rolle in Rollenfarbe; Tabelle in fester Reihenfolge Tank, Heiler, Schaden: TODE, ZEIT TOT,
   ANGRIFFE 3 S+, DABEI; Korr 1 / 0:42 / 1, Nyra 1 / 0:39; Arden bei Angriffen „-“; deine Zeile mit Strich und „(du)“;
-  Zeile „Gruppe“ mit „kein Wipe“; Reiter „Beitrag“ ausgegraut mit Tooltip
+  Zeile „Gruppe“ mit „kein Wipe“; Reiter „Beitrag“ wählbar (PT-CHRON-075)
   - ❌ FAIL 2026-10-19 (Owner: mal ganze Figuren, mal nur Porträts — bitte nur Porträts)
   - 🔧 FIX IMPLEMENTED 2026-10-19 (immer das Porträt, keine 3D-Figur mehr)
   - MANUAL RETEST REQUIRED
@@ -129,6 +132,16 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   Bericht ein/aus (das Addon belegt selbst keine Taste)
 - [ ] PT-CHRON-074 Im Dungeon: Linksklick auf die Run-Uhr öffnet den Bericht; Ziehen verschiebt sie, ohne den Bericht
   zu öffnen; Rechtsklick zeigt das Menü
+
+## Beitrag (Schadensmesser)
+
+- [ ] PT-CHRON-075 `/pchron test` → Gruppenergebnis → „Beitrag“: Spalten SCHADEN, HEILUNG, UNTERBR., BANNUNGEN; Kael
+  27.0k Schaden, 6 Unterbr.; Mira 21.5k Heilung, 4 Bannungen; Zeile „Gruppe“ mit den Summen; feste Reihenfolge, nichts
+  hervorgehoben; zurück zu „Überleben“ zeigt wieder Tode usw.
+- [ ] PT-CHRON-076 Nach einem echten Run: „Beitrag“ zeigt Zahlen für alle Mitglieder; ungefähr wie WoWs eigener
+  Schadensmesser über den ganzen Run (Gesamt); dein eigener Blizzard-Schadensmesser wird nie zurückgesetzt
+- [ ] PT-CHRON-077 Run endet von selbst beim Endboss (noch im Kampf): nach dem Kampf enthält „Beitrag“ auch den
+  Endboss-Kampf (Bericht aktualisiert sich); ein älterer Run zeigt „n. v.“ mit Grund im Tooltip
 
 ## Run-Uhr
 

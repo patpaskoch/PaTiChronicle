@@ -272,4 +272,39 @@ function Run.GroupDeaths(run)
     return total
 end
 
+-- Contribution (redesign step 9, owner 2026-10-19): damage, healing, interrupts and dispels from WoW's damage meter,
+-- read by Meter.lua after every fight. One snapshot per meter session ({ [name] = { damage = n, … } }), replaced
+-- while WoW still lists the session (a growing session is never counted twice) and kept once it expires.
+-- before: the session IDs that existed before the run; they never count.
+Run.METER_KINDS = { "damage", "healing", "interrupts", "dispels" }
+Run.MAX_SESSIONS = 150
+
+function Run.MeterStart(run, before)
+    run.meter = { before = before or {}, sessions = {}, count = 0 }
+end
+
+function Run.MeterSession(run, id, values)
+    local meter = run.meter
+    if not meter or meter.before[id] then return end
+    if not meter.sessions[id] then
+        if meter.count >= Run.MAX_SESSIONS then return end
+        meter.count = meter.count + 1
+    end
+    meter.sessions[id] = values
+end
+
+-- { [name] = { damage = n, … } } summed over the run's sessions; nil without readable meter data.
+function Run.MeterTotals(run)
+    if not (run.meter and run.data.meter) then return nil end
+    local totals = {}
+    for _, values in pairs(run.meter.sessions) do
+        for name, kinds in pairs(values) do
+            local sum = totals[name] or {}
+            totals[name] = sum
+            for kind, amount in pairs(kinds) do sum[kind] = (sum[kind] or 0) + amount end
+        end
+    end
+    return totals
+end
+
 return Run

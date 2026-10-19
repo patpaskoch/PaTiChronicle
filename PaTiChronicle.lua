@@ -5,13 +5,17 @@
 -- settings and commands: Settings.lua.
 local addonName, ns = ...
 local UI, L, Logic, Run, Chronicle = ns.UI, ns.UI.L, ns.Logic, ns.Run, ns.Chronicle
-local Report, Hud, Sample, Probe = ns.Report, ns.Hud, ns.Sample, ns.Probe
+local Report, Hud, Sample, Probe, Meter = ns.Report, ns.Hud, ns.Sample, ns.Probe, ns.Meter
 
 local DB
 local window = Report.window
 local memberUnits = {} -- { [unit] = name }: player and party1-4
 local testMode = false -- runtime only: the report shows the example run
 local meterInCombat = false -- probe: look at C_DamageMeter once during the next fight (test T6c)
+-- Contribution (Meter.lua): the meter sessions WoW listed at the last moment out of combat (they never count for a
+-- run that starts after it), and a run that ended in combat (its last fight is read once after combat).
+local idleSessions
+local meterAfterRun
 
 local function say(key, ...)
     print("|cff68caffPaTiChronicle:|r " .. L[key]:format(...))
@@ -138,6 +142,7 @@ local function finishRun(how)
     noteMembers(run)
     if how == "manual" and Chronicle.LearnEndBoss(DB, run, now) then say("END_BOSS_LEARNED", run.name) end
     Run.Finish(run, now, how, GetTime())
+    if InCombatLockdown and InCombatLockdown() then meterAfterRun = run else Meter.Read(run) end
     local names = groupNames()
     local result = Chronicle.Evaluate(DB, run, #names, names)
     Chronicle.Store(DB, run, result.summary)
@@ -311,6 +316,7 @@ local function onFightStart()
     local now = time()
     if not DB.run then
         DB.run = Run.New(instance, now, { name = memberUnits.player or "?", role = myRole() })
+        if Meter.Available() then Run.MeterStart(DB.run, idleSessions) end
         say("RUN_STARTED", instance.name)
     end
     DB.probe.fights = DB.probe.fights + 1
@@ -351,7 +357,14 @@ events:SetScript("OnEvent", function(_, event, ...)
         if DB.run then
             Run.FightEnd(DB.run, time(), GetTime())
             Probe.DamageMeter(DB.probe, false)
+            Meter.Read(DB.run)
         end
+        if meterAfterRun then
+            Meter.Read(meterAfterRun)
+            meterAfterRun = nil
+            Report.Refresh()
+        end
+        idleSessions = Meter.SessionIds()
     elseif event == "PLAYER_LOGOUT" then
         if DB.run then Run.Logout(DB.run, time()) end
     elseif event == "GROUP_ROSTER_UPDATE" then
@@ -359,6 +372,7 @@ events:SetScript("OnEvent", function(_, event, ...)
         if DB.run then noteMembers(DB.run) end
     else -- PLAYER_ENTERING_WORLD, ZONE_CHANGED_NEW_AREA
         readMembers()
+        if not (InCombatLockdown and InCombatLockdown()) then idleSessions = Meter.SessionIds() end
         onLocation()
     end
 end)

@@ -18,6 +18,7 @@ ReportGroup.lua
 ReportMine.lua
 ReportTimeline.lua
 Hud.lua
+Meter.lua
 Probe.lua
 Minimap.lua
 PaTiChronicle.lua

@@ -87,3 +87,11 @@ describe("Logic.Clock", function()
         assert.same({ "-0:48", "+1:05" }, { Logic.Delta(-48), Logic.Delta(65) })
     end)
 end)
+
+describe("Logic.Amount", function()
+    it("shortens meter amounts", function()
+        local Logic = load()
+        assert.same({ "950", "12.3k", "2.4M", "-" },
+            { Logic.Amount(950), Logic.Amount(12345), Logic.Amount(2400000), Logic.Amount(nil) })
+    end)
+end)

@@ -13,7 +13,7 @@ Addon facts: `../../PaTiAdmin/docs/ARCHITECTURE.md` · open issues: `../../PaTiA
 - Files: `Logic.lua` (settings, migration, probe, clock; pure) · `Run.lua` (run rules and events; pure) ·
   `Chronicle.lua` (history, best times, achievements, development; pure) · `Sample.lua` (example run through the
   same rules; pure) · `Report.lua` (window, tabs, building blocks, Overview) · `ReportGroup.lua` ·
-  `ReportMine.lua` · `ReportTimeline.lua` · `Hud.lua` (run clock line) · `Minimap.lua` (minimap button) ·
+  `ReportMine.lua` · `ReportTimeline.lua` · `Hud.lua` (run clock line) · `Minimap.lua` (minimap button) · `Meter.lua` (contribution from C_DamageMeter) ·
   `Probe.lua` (read-only API probe) · `Bindings.xml`
   (key binding `PaTiChronicle_Toggle`) · `PaTiChronicle.lua` (adapters, events, runs) · `Settings.lua` (settings, menu,
   commands, probe output) · `Locales/` · `Shared/` (PaTiShared, synced — never edit). Tests: `tests/*_spec.lua`.
@@ -22,12 +22,14 @@ Addon facts: `../../PaTiAdmin/docs/ARCHITECTURE.md` · open issues: `../../PaTiA
 - **Achievements only for reliable data** (`Chronicle.Reliable`): never for missing, secret or incomplete data —
   then a `missing` entry with the reason. Never name another player for an aggro moment; never a cause of death.
 - **Never register `COMBAT_LOG_EVENT_UNFILTERED`:** this client reserves it for the Blizzard UI (forbidden popup,
-  owner 2026-10-19; pcall does not help). `C_DamageMeter`: only its function names are listed by the probe.
+  owner 2026-10-19; pcall does not help). `C_DamageMeter`: read only, never `ResetAllCombatSessions`;
+  values are secret in combat, so `Meter.lua` reads only out of combat (after each fight) into `run.meter`
+  (`Run.MeterSession`, one snapshot per session; sessions from before the run never count).
 - Secret values: a secret threat status or death state is recorded as "secret" (`run.data.*Secret`), never compared.
 - Hot path: `UNIT_HEALTH` (filtered to player/party1-4, one `UnitIsDeadOrGhost` per member) and
   `UNIT_THREAT_SITUATION_UPDATE`. The HUD ticks once a second only while shown and a run is running.
 - SavedVariables: `PaTiChronicleDB` (per character), schema 2 — settings, position, `hud`, `probe`, `run` (running),
-  `report` (the last one), `runs[key]` (last 20 summaries), `bests`, `groupBests`, `teams`, `streaks`, `endBosses`.
+  `report` (the last one; runs carry `meter` = { before, sessions, count }), `runs[key]` (last 20 summaries), `bests`, `groupBests`, `teams`, `streaks`, `endBosses`.
   Any shape change: bump `Logic.SCHEMA`, add a migration step and a test.
 - Secure / combat-sensitive: none. Windows: the report is the suite's main window (`UI.CreateWindow`); the HUD is
   a plain frame with its own position.

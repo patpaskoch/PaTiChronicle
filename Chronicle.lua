@@ -217,6 +217,9 @@ function Chronicle.PlayerRows(run, names)
     local threat = run.complete and run.data.threat and not run.data.threatSecret
     local recent = (run.version or 0) >= ns.Run.VERSION
     local rows, total = {}, { deaths = 0, deadTime = 0, attacked = 0, known = {} }
+    -- Contribution: from WoW's damage meter (Meter.lua); a run without it (older, or no meter) shows "n/a".
+    local meter = ns.Run.MeterTotals(run)
+    for _, kind in ipairs(ns.Run.METER_KINDS) do total[kind] = 0 end
     local function value(row, key, number, reason)
         if number ~= nil then
             row[key] = number
@@ -246,6 +249,9 @@ function Chronicle.PlayerRows(run, names)
         row.attackTimes = recent and run.attacked[name] and run.attacked[name].times or nil
         row.deathTimes = recent and run.deathTimes[name] or nil
         row.present = recent and ns.Run.PresentSeconds(run, name) or nil
+        for _, kind in ipairs(ns.Run.METER_KINDS) do
+            value(row, kind, meter and ((meter[name] or {})[kind] or 0) or nil, "METER")
+        end
         rows[#rows + 1] = row
     end
     return rows, total

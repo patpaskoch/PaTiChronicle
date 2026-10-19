@@ -111,6 +111,14 @@ function Logic.Clock(seconds)
     return ("%d:%02d"):format(m, s)
 end
 
+-- Meter amounts: 950 → "950", 12345 → "12.3k", 2400000 → "2.4M", nil → "-".
+function Logic.Amount(value)
+    if type(value) ~= "number" then return "-" end
+    if value >= 1000000 then return ("%.1fM"):format(value / 1000000) end
+    if value >= 1000 then return ("%.1fk"):format(value / 1000) end
+    return tostring(math.floor(value + 0.5))
+end
+
 -- Signed difference in clock form: -48 → "-0:48", 65 → "+1:05".
 function Logic.Delta(seconds)
     return (seconds < 0 and "-" or "+") .. Logic.Clock(math.abs(seconds))

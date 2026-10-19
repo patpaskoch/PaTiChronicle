@@ -1,6 +1,13 @@
 # Changelog
 
 Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed, Removed, Known Issues.
+### Added
+- Group result, tab **Contribution** (redesign step 9, after the probe 2026-10-19): damage, healing, interrupts and
+  dispels per member and for the group, from WoW's own damage meter (`C_DamageMeter`, read only, never reset). Its
+  values are secret during a fight, so every session is read after the fight; a run that ends in combat gets its
+  last fight after combat. Fixed order, nothing highlighted, no ranking. Older runs show "n/a" with the reason.
+  Test mode has example values.
+
 ### Fixed
 - A member's changed role, class or level during a run is now taken over (owner 2026-10-19: the healer change was
   not shown); before, the first reading stayed.

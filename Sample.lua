@@ -22,6 +22,21 @@ local FIGHTS = {
     { 1170, 1215 }, { 1262, 1300 }, { 1340, 1453, "Edwin VanCleef" },
 }
 
+-- Contribution as WoW's damage meter would give it: damage and healing per second of fight; interrupts on boss
+-- fights, a dispel every fourth fight. One meter session per fight.
+local METER = { Arden = { 18, 2 }, Mira = { 4, 27 }, Kael = { 34, 0 }, Korr = { 29, 1 }, Nyra = { 31, 0 } }
+
+local function meterSession(run, index, fight)
+    local seconds, values = fight[2] - fight[1], {}
+    for name, rate in pairs(METER) do
+        values[name] = { damage = rate[1] * seconds, healing = rate[2] * seconds, interrupts = 0, dispels = 0 }
+    end
+    if fight[3] then values.Kael.interrupts, values.Nyra.interrupts = 2, 1 end
+    if index % 4 == 0 then values.Mira.dispels = 1 end
+    run.data.meter = true
+    Run.MeterSession(run, index, values)
+end
+
 -- The history before the example run: four earlier runs as a mage, best time 25:01, twice with this group.
 local function history(group)
     local runs = {}
@@ -43,7 +58,8 @@ function Sample.Report(dungeonName)
         Run.DeathState(run, member.name, false, false, START)
     end
     Run.Presence(run, names, START)
-    for _, fight in ipairs(FIGHTS) do
+    Run.MeterStart(run, {})
+    for index, fight in ipairs(FIGHTS) do
         Run.FightStart(run, START + fight[1])
         if fight[3] then Run.BossStart(run) end
         Run.Threat(run, "Arden", 3, true, false, fight[1], START + fight[1])
@@ -59,6 +75,7 @@ function Sample.Report(dungeonName)
         end
         if fight[3] then Run.BossEnd(run, START + fight[2], fight[3], true) end
         Run.FightEnd(run, START + fight[2], fight[2])
+        meterSession(run, index, fight)
     end
     Run.Threat(run, ME, 0, false, true, 1453, START + 1453)
     Run.Finish(run, START + 1453, "auto", 1453)

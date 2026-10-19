@@ -1,8 +1,8 @@
 -- PaTiChronicle run report, tab "Group result" (owner 2026-10-19): the five members side by side as portraits
 -- (owner 2026-10-19: no 3D characters, the portrait is steadier) — and below a calm result table with all of
 -- them. Fixed order (tank, healer, damage), never sorted by values, no highlighted maximum, no winner. Values come
--- from Chronicle.PlayerRows; a missing value shows "n/a" with its reason, never 0. "Contribution" (damage,
--- healing, interrupts) stays switched off until C_DamageMeter is confirmed.
+-- from Chronicle.PlayerRows; a missing value shows "n/a" with its reason, never 0. "Contribution" (damage, healing,
+-- interrupts, dispels) comes from WoW's damage meter (Meter.lua, confirmed by the probe 2026-10-19).
 local _, ns = ...
 local UI, L, Logic, Chronicle, Report = ns.UI, ns.UI.L, ns.Logic, ns.Chronicle, ns.Report
 
@@ -14,11 +14,19 @@ local FIGURES_TOP = -30
 local TABLE_TOP = -196
 local ROW = 28 -- a little tighter than Report.ROW: five members, the total and the detail line fit the page
 local NAME_COLUMN = 200
--- Survival columns: key, header key, right edge (x).
-local COLUMNS = { { key = "deaths", text = "COL_DEATHS", right = 300 },
-    { key = "deadTime", text = "COL_DEAD_TIME", right = 395, clock = true },
-    { key = "attacked", text = "COL_ATTACKS", right = 510 },
-    { key = "present", text = "COL_PRESENT", right = width, clock = true } }
+-- Columns per category: key, header key, right edge (x); clock = a time, amount = a meter amount. Both sets share
+-- the four column positions.
+local COLUMN_SETS = {
+    survival = { { key = "deaths", text = "COL_DEATHS", right = 300 },
+        { key = "deadTime", text = "COL_DEAD_TIME", right = 395, clock = true },
+        { key = "attacked", text = "COL_ATTACKS", right = 510 },
+        { key = "present", text = "COL_PRESENT", right = width, clock = true } },
+    contribution = { { key = "damage", text = "COL_DAMAGE", right = 300, amount = true },
+        { key = "healing", text = "COL_HEALING", right = 395, amount = true },
+        { key = "interrupts", text = "COL_INTERRUPTS", right = 510 },
+        { key = "dispels", text = "COL_DISPELS", right = width } },
+}
+local COLUMNS = COLUMN_SETS.survival -- the positions
 
 local headline = Report.Text(page, "Heading", "Text")
 headline:SetPoint("TOP", 0, -2)
@@ -54,10 +62,11 @@ end
 
 Report.SectionTitle(page, 0, TABLE_TOP, "SECTION_RESULT")
 local category = "survival"
+local fillTable -- defined below
 local categories = Report.TextTabs(page, {
     { id = "survival", text = "CAT_SURVIVAL" },
-    { id = "contribution", text = "CAT_CONTRIBUTION", disabled = true, tip = "CAT_CONTRIBUTION_NA" },
-}, function(id) category = id end, "Body")
+    { id = "contribution", text = "CAT_CONTRIBUTION" },
+}, function(id) category = id; fillTable() end, "Body")
 categories:Layout(20)
 categories.anchor:SetPoint("TOPRIGHT", page, "TOPRIGHT", -categories.width, TABLE_TOP + 6)
 Report.Divider(page, TABLE_TOP - 22)
@@ -65,10 +74,11 @@ Report.Divider(page, TABLE_TOP - 22)
 local header = CreateFrame("Frame", nil, page)
 header:SetSize(width, 20)
 header:SetPoint("TOPLEFT", 0, TABLE_TOP - 28)
-for _, column in ipairs(COLUMNS) do
+local headerTexts = {}
+for index, column in ipairs(COLUMNS) do
     local text = Report.Text(header, "Caption", "TextMuted")
     text:SetPoint("RIGHT", header, "LEFT", column.right, 0)
-    UI.BindText(text, column.text)
+    headerTexts[index] = text
 end
 
 local rows = {}
@@ -116,7 +126,7 @@ note:SetWidth(width)
 note:SetJustifyH("LEFT")
 UI.BindText(note, "CONTRIBUTION_NOTE")
 
--- One cell: a number, a clock, "-" (nothing to show: 0 seconds dead, attacks of a tank) or "n/a" + reason.
+-- One cell: a number, an amount, a clock, "-" (nothing to show: 0 seconds dead, attacks of a tank) or "n/a" + reason.
 local function fillCell(cell, column, value, reason)
     local text, color, tip
     color = "Text"
@@ -126,6 +136,8 @@ local function fillCell(cell, column, value, reason)
     elseif column.clock then
         text = value > 0 and Logic.Clock(value) or "-"
         color = value > 0 and "Text" or "TextMuted"
+    elseif column.amount then
+        text = Logic.Amount(value)
     else
         text = tostring(value)
     end
@@ -196,6 +208,17 @@ Report.views.group = function(report)
             UI.Paint(slot.role, "SetTextColor", Report.ROLE_COLOR[row.role] or "TextMuted")
         end
     end
+    fillTable()
+    if selected and not run.members[selected] then selected = nil end
+    fillDetail()
+end
+
+-- The table of the chosen category (survival or contribution) for the report shown.
+fillTable = function()
+    if not shown then return end
+    local playerRows, total, run = shown.rows, shown.total, shown.report.run
+    local columns = COLUMN_SETS[category]
+    for index, column in ipairs(columns) do UI.BindText(headerTexts[index], column.text) end
     for index, tableRow in ipairs(rows) do
         local row = playerRows[index]
         tableRow:SetShown(row ~= nil)
@@ -204,7 +227,7 @@ Report.views.group = function(report)
             Report.ClassColor(tableRow.name, row.classFile)
             tableRow.role:SetText(L[Report.ROLE_TEXT[row.role] or "ROLE_NONE"])
             tableRow.bar:SetShown(row.me)
-            for columnIndex, column in ipairs(COLUMNS) do
+            for columnIndex, column in ipairs(columns) do
                 fillCell(tableRow.cells[columnIndex], column, row[column.key], row[column.key .. "Reason"])
             end
         end
@@ -212,7 +235,7 @@ Report.views.group = function(report)
     totalRow.name:SetText(L.ROW_GROUP)
     UI.Paint(totalRow.name, "SetTextColor", "Text")
     totalRow.role:SetText("")
-    for columnIndex, column in ipairs(COLUMNS) do
+    for columnIndex, column in ipairs(columns) do
         local cell = totalRow.cells[columnIndex]
         if column.key == "present" then
             local deathsKnown = Chronicle.Reliable(run).deaths
@@ -220,11 +243,10 @@ Report.views.group = function(report)
             UI.Paint(cell.text, "SetTextColor", deathsKnown and "Text" or "TextMuted")
             UI.SetTooltip(cell, not deathsKnown and L.NA_DATA or nil)
         else
-            fillCell(cell, column, total.known[column.key] and total[column.key] or nil, "DATA")
+            local reason = category == "contribution" and "METER" or "DATA"
+            fillCell(cell, column, total.known[column.key] and total[column.key] or nil, reason)
         end
     end
     totalLine:Show()
     categories:Select(category)
-    if selected and not run.members[selected] then selected = nil end
-    fillDetail()
 end

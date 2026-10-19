@@ -18,8 +18,8 @@ the group, then your part, then the details:
   colour, class and role), achievements as medallions and two highlights of the run.
 - **Group result** — the five members side by side as portraits
   and a table in fixed order (tank, healer, damage — never sorted by values): deaths, time dead, attacks of 3 s or
-  more, time in the group, the group total. A click shows the times. Damage, healing and interrupts only once the
-  client's damage meter is confirmed. Missing values show "n/a" with the reason — never 0.
+  more, time in the group, the group total. A click shows the times. A second tab, **Contribution**, shows damage, healing,
+  interrupts and dispels from WoW's own damage meter (read after every fight, never reset). Missing values show "n/a" with the reason — never 0.
 - **My performance** — what you can be proud of (your achievements), your development against your own average in
   this dungeon and role (in words: "2:29 faster than your average", "your best run here") and where there is room.
 - **Timeline** — the run on a time axis (fights, boss fights, deaths, aggro moments), the list of what happened and
@@ -91,7 +91,8 @@ Restore Defaults (keeps the position, runs, best times and the probe).
 
 ## Known limitations
 - The combat log is reserved for the Blizzard UI in this client: no damage, healing, interrupts or killing blows.
-  `C_DamageMeter` exists; the probe lists its functions, nothing is used yet.
+  Contribution comes from `C_DamageMeter` instead: its values are secret during a fight, so it is read after each fight
+  (a run that ends in combat gets its last fight after combat). Runs from before 0.2.0 show "n/a" there.
 - Boss events and readable threat/death states are not confirmed yet (probe, INGAME_TESTING.md T1–T7).
 - Only what your client sees; members far away may be missed.
 - No icon yet.
