@@ -161,7 +161,10 @@ function Chronicle.Evaluate(db, run, size, names)
     for _, row in ipairs(result.development) do
         if row.state == "better" and row.avg and row.avg > 0 then
             local gain = (row.avg - row.value) / row.avg
-            if gain > bestGain then bestGain, bestRow = gain, row end
+            -- Same gain: the value with the larger average says more ("aggro 0, average 1.8" beats "deaths 0, 0.2").
+            if gain > bestGain or (bestRow and gain == bestGain and row.avg > bestRow.avg) then
+                bestGain, bestRow = gain, row
+            end
         end
     end
     if bestRow then

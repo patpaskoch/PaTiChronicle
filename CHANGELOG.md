@@ -34,6 +34,9 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
   (owner screenshot 2026-10-19): the report window now opens with the note "No run yet …" instead, with a button
   "Test mode: view an example run".
 
+- Overview: the reason under a group achievement was cut off ("0:48 faster than your b…"); it now takes two lines.
+- "Improved" named the weaker value on a tie ("deaths 0, average 0.2"); it now names the one with the larger average.
+
 ### Known Issues
 - Not tested in game. Boss events, readable threat and death states are unconfirmed (probe, PT-CHRON-010…016);
   achievements that need them stay "not checkable" until then. No icon yet.

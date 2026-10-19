@@ -134,7 +134,9 @@ function Report.Achievement(parent, width)
     detail:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -1)
     detail:SetPoint("RIGHT")
     detail:SetJustifyH("LEFT")
-    detail:SetWordWrap(false)
+    -- Two lines for the reason: in the narrow Overview columns one line cut it off (owner screenshot 2026-10-19).
+    detail:SetWordWrap(true)
+    if detail.SetMaxLines then detail:SetMaxLines(2) end
     function frame.Set(_, entry)
         icon:SetTexture(ns.Chronicle.ICONS[entry.id])
         local titleText, detailText = Report.AchievementText(entry)

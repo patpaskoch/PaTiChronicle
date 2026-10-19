@@ -139,6 +139,8 @@ describe("Sample.Report", function()
         local report = load().Sample.Report("Die Todesminen")
         assert.same({ "BEST_TIME", "TEAM", "NO_WIPE" }, ids(report.result.group))
         assert.same({ "STEADFAST", "CLEAN_AGGRO", "IMPROVED" }, ids(report.result.mine))
+        -- Deaths and aggro both improved by 100 %: the larger average (aggro 1.75 vs. deaths 0.25) is named.
+        assert.equal("aggro", report.result.mine[3].args.metric)
         assert.same({ 5, 2, 1453, 5 }, { report.result.group[2].args.count + 2, report.result.summary.groupDeaths,
             report.result.summary.time, report.result.mine[1].args.streak })
     end)
