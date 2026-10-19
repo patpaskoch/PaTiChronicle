@@ -2,7 +2,16 @@
 
 Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed, Removed, Known Issues.
 
-## [Unreleased] — 0.1.0
+## [Unreleased] — 0.2.0 PaTiChronicle
+### Changed
+- Renamed from PaTiCompetition to **PaTiChronicle** — "Every run tells a story" (owner decision 2026-10-19): a
+  chronicle of dungeon runs instead of a competition between players. GitHub repo renamed (history kept). Commands
+  `/pchron`, `/patichronicle`; the old `/pcomp` still works until 0.3.0. SavedVariables `PaTiChronicleDB` (the old
+  `PaTiCompetitionDB` file is copied over once by hand, see README). In-game tests start again as PT-CHRON-…; the
+  old PT-COMP-… are retired.
+
+Earlier, as PaTiCompetition 0.1.0 (never released):
+
 ### Added
 - New addon (owner wish 2026-10-18): dungeon competition "PaTi Competition" — run clock until the end boss, then an
   end screen (portrait, name, damage, damage taken, healing, pulled aggro, score). 0.1.0 is the test run only.

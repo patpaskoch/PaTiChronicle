@@ -1,4 +1,4 @@
--- PaTiCompetition combat-log parsing, totals, run clock and SavedVariables. Run via PaTiAdmin/tools/check.sh.
+-- PaTiChronicle combat-log parsing, totals, run clock and SavedVariables. Run via PaTiAdmin/tools/check.sh.
 local wow = require("wow_api")
 
 local function load()

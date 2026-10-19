@@ -1,5 +1,5 @@
--- PaTiCompetition score and end-screen values: who counts as tank, the score 0-100, card order, short numbers and
--- the example values of /pcomp test. Pure: no WoW calls. Tested in tests/score_spec.lua.
+-- PaTiChronicle score and end-screen values: who counts as tank, the score 0-100, card order, short numbers and
+-- the example values of /pchron test. Pure: no WoW calls. Tested in tests/score_spec.lua.
 local _, ns = ...
 local Score = {}
 ns.Score = Score
@@ -104,7 +104,7 @@ function Score.Short(value, format)
     return pattern:format(text)
 end
 
--- Example values for /pcomp test (the owner's design, 2026-10-19), in classic dungeon sizes; level and class
+-- Example values for /pchron test (the owner's design, 2026-10-19), in classic dungeon sizes; level and class
 -- (classFile: the client names it) since the owner's wish of 2026-10-19.
 function Score.Sample()
     return {

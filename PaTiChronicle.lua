@@ -1,8 +1,8 @@
--- PaTiCompetition 0.1.0: the probe. Before the dungeon competition (run clock, end screen with damage, damage taken,
+-- PaTiChronicle 0.1.0: the probe. Before the dungeon competition (run clock, end screen with damage, damage taken,
 -- healing and a score) is built, this finds out what the WoW Forever client really delivers: a source for the
 -- numbers (the combat log is reserved for the Blizzard UI here) and the boss fight events.
 -- Display only: nothing is cast, targeted or sent.
--- Results stay in PaTiCompetitionDB.probe (SavedVariables) and are shown with /pcomp probe.
+-- Results stay in PaTiChronicleDB.probe (SavedVariables) and are shown with /pchron probe.
 local addonName, ns = ...
 local UI, L, Logic, Score, Results = ns.UI, ns.UI.L, ns.Logic, ns.Score, ns.Results
 
@@ -12,7 +12,7 @@ local memberUnits = {} -- { [unit] = name }: player and party (whose threat stat
 local threatStatus = {} -- { [unit] = last UnitThreatSituation }, runtime only
 
 local function say(key, ...)
-    print("|cff68caffPaTiCompetition:|r " .. L[key]:format(...))
+    print("|cff68caffPaTiChronicle:|r " .. L[key]:format(...))
 end
 
 local function isSecret(value) return issecretvalue ~= nil and issecretvalue(value) == true end
@@ -97,8 +97,8 @@ end
 
 events:SetScript("OnEvent", function(_, event, ...)
     if event == "PLAYER_LOGIN" then
-        PaTiCompetitionDB = Logic.Migrate(PaTiCompetitionDB)
-        DB = PaTiCompetitionDB
+        PaTiChronicleDB = Logic.Migrate(PaTiChronicleDB)
+        DB = PaTiChronicleDB
         UI.SetLanguage(DB.language)
         window:Attach(DB, 0, 80)
         window:SetScale(DB.scale)
@@ -180,7 +180,7 @@ end
 local modal
 
 local function buildSettings()
-    modal = UI.CreateModal("PaTiCompetitionSettings", function() return "PaTiCompetition " .. L.SETTINGS end, 380)
+    modal = UI.CreateModal("PaTiChronicleSettings", function() return "PaTiChronicle " .. L.SETTINGS end, 380)
     local scales = {}
     for _, scale in ipairs(Logic.SCALES) do
         scales[#scales + 1] = { value = scale, text = function() return ("%d %%"):format(scale * 100 + 0.5) end }
@@ -288,9 +288,10 @@ local COMMANDS = {
     version = function() say("VERSION", addonVersion()) end,
 }
 
-SLASH_PATICOMPETITION1 = "/paticompetition"
-SLASH_PATICOMPETITION2 = "/pcomp"
-SlashCmdList.PATICOMPETITION = function(message)
+SLASH_PATICHRONICLE1 = "/patichronicle"
+SLASH_PATICHRONICLE2 = "/pchron"
+SLASH_PATICHRONICLE3 = "/pcomp" -- old name (PaTiCompetition), kept until 0.3.0
+SlashCmdList.PATICHRONICLE = function(message)
     local command = COMMANDS[(message or ""):match("^%s*(.-)%s*$"):lower()]
     if command and DB then command() else say("HELP") end
 end

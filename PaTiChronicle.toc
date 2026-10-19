@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: PaTiChronicle
+## Notes: Every run tells a story: dungeon run chronicle with run report, best times and achievements
+## Notes-deDE: Jeder Run erzählt eine Geschichte: Dungeon-Chronik mit Run-Bericht, Bestzeiten und Erfolgen
+## Author: PaTi
+## Version: 0.2.0
+## SavedVariablesPerCharacter: PaTiChronicleDB
+
+Shared\Shared.xml
+Locales\enUS.lua
+Locales\deDE.lua
+Logic.lua
+Score.lua
+Results.lua
+PaTiChronicle.lua

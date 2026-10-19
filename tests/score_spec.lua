@@ -1,4 +1,4 @@
--- PaTiCompetition score, tank, card order and short numbers. Run via PaTiAdmin/tools/check.sh.
+-- PaTiChronicle score, tank, card order and short numbers. Run via PaTiAdmin/tools/check.sh.
 local wow = require("wow_api")
 
 local function load()

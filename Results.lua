@@ -1,7 +1,7 @@
--- PaTiCompetition end screen "Party Competition": one card per member (up to five) with portrait, name, level and
+-- PaTiChronicle end screen "Party Competition": one card per member (up to five) with portrait, name, level and
 -- class, role, the run's values with the points each one gives, and the score; the best score has a gold frame.
 -- Layout after the owner's design (2026-10-19). Display only, no secure frames. Values come from
--- PaTiCompetition.lua (Results.Show).
+-- PaTiChronicle.lua (Results.Show).
 local _, ns = ...
 local UI, L = ns.UI, ns.UI.L
 local Results = {}
@@ -49,11 +49,11 @@ local STATS = {
     { key = "deaths", label = "STAT_DEATHS", icon = "Interface\\TargetingFrame\\UI-TargetingFrame-Skull" },
 }
 
-local window = UI.CreateWindow("PaTiCompetitionFrame", "PaTiCompetition", WIDTH, HEIGHT)
+local window = UI.CreateWindow("PaTiChronicleFrame", "PaTiChronicle", WIDTH, HEIGHT)
 window:SetCombatMovable(true) -- no secure children
 window:SetFrameStrata("HIGH")
 window:Hide()
-tinsert(UISpecialFrames, "PaTiCompetitionFrame") -- Esc closes the end screen
+tinsert(UISpecialFrames, "PaTiChronicleFrame") -- Esc closes the end screen
 Results.window = window
 
 local title = window:CreateFontString(nil, "OVERLAY", FONT_TITLE)

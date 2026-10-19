@@ -1,11 +1,15 @@
-# PaTiCompetition
+# PaTiChronicle
+
+> Formerly **PaTiCompetition** (renamed 2026-10-19). The old `/pcomp` command still works until 0.3.0. Saved data:
+> WoW keeps it per addon folder, so copy `WTF/…/SavedVariables/PaTiCompetition.lua` to `PaTiChronicle.lua` once
+> (WoW closed) and rename `PaTiCompetitionDB` inside to `PaTiChronicleDB`; otherwise PaTiChronicle starts fresh.
 
 A dungeon competition for World of Warcraft: Forever (Interface 16001): a clock runs from the first fight in a
 dungeon until the end boss is dead, then an end screen shows every member of the group with portrait,
 name, damage done, healing, damage taken, interrupts, killing blows, pulled aggro, deaths and a score. More than a
 damage meter: the group plays against its own best time and compares who did best.
 
-> Status: 0.1.0 = test run (probe) + the end screen "Party Competition" (`/pcomp show`, `/pcomp test`). The clock
+> Status: 0.1.0 = test run (probe) + the end screen "Party Competition" (`/pchron show`, `/pchron test`). The clock
 > does not stop at the end boss yet. Not yet tested in game.
 
 ## What 0.1.0 does
@@ -19,10 +23,10 @@ damage meter: the group plays against its own best time and compares who did bes
 - Shows nothing by itself except a chat line when the clock starts and when a boss fight ends.
   Nothing is cast, targeted or sent to others
 
-Results are saved in `PaTiCompetitionDB` (SavedVariables, per character) with `/reload` or logout.
+Results are saved in `PaTiChronicleDB` (SavedVariables, per character) with `/reload` or logout.
 
 ## End screen "Party Competition"
-`/pcomp show` opens it with the values of the current run, `/pcomp test` with example values. Five cards side by
+`/pchron show` opens it with the values of the current run, `/pchron test` with example values. Five cards side by
 side (tank, healer, then damage dealers), each with portrait (framed in the role colour: tank blue, healer green,
 damage red), name, level and class (class colour), role, damage, healing, damage taken, interrupts, killing blows,
 pulled aggro, deaths and the score (number and bar 0–100). Each value row has a bar with the points it gives (green
@@ -46,17 +50,17 @@ Each one is installed on its own and works on its own; none of them is needed by
 Overview of all addons: [PaTiAdmin](https://github.com/patpaskoch/PaTiAdmin).
 
 ## Installation
-1. Download the release zip (`PaTiCompetition-<version>.zip`).
-2. Unpack it and copy the folder `PaTiCompetition` into `World of Warcraft/<client>/Interface/AddOns/`.
-3. Start WoW and enable PaTiCompetition in the AddOns list.
+1. Download the release zip (`PaTiChronicle-<version>.zip`).
+2. Unpack it and copy the folder `PaTiChronicle` into `World of Warcraft/<client>/Interface/AddOns/`.
+3. Start WoW and enable PaTiChronicle in the AddOns list.
 
 ## Commands
-`/pcomp` or `/paticompetition` (end screen on / off) — `show` · `hide` · `test` (test mode: example values on / off) ·
+`/pchron` or `/patichronicle` (end screen on / off) — `show` · `hide` · `test` (test mode: example values on / off) ·
 `lock` · `unlock` · `reset` (window back to its default position) · `settings` · `probe` (test results in the chat) ·
 `clear` (clear the test results and start again) · `version`
 
 ## Settings
-••• → Settings (or `/pcomp settings`), like the other PaTi addons: language, scale, lock window, theme (WoForever by
+••• → Settings (or `/pchron settings`), like the other PaTi addons: language, scale, lock window, theme (WoForever by
 default), panel opacity, the test mode switch top right and Restore Defaults (keeps the position and the test
 results). ••• also has Lock, Test Mode and Hide.
 

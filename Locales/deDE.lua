@@ -1,4 +1,4 @@
--- PaTiCompetition strings, Deutsch. One key per line: L.KEY = "Text". Missing keys fall back to English.
+-- PaTiChronicle strings, Deutsch. One key per line: L.KEY = "Text". Missing keys fall back to English.
 local _, ns = ...
 ns.Locales = ns.Locales or {}
 local L = ns.Locales.deDE or {}
@@ -6,7 +6,7 @@ ns.Locales.deDE = L
 
 L.YES = "ja"
 L.NO = "nein"
-L.HELP = "/pcomp show, hide, test, lock, unlock, reset, settings, probe, clear, version"
+L.HELP = "/pchron show, hide, test, lock, unlock, reset, settings, probe, clear, version"
 L.CMD_PROBE = "Testergebnis im Chat"
 L.CMD_CLEAR = "Testergebnis löschen und neu beginnen"
 L.GENERAL = "Allgemein"
@@ -23,7 +23,7 @@ L.PROBE_PLAYER = "%s (%s): Schaden %d · erlitten %d · Heilung %d · Unterbrech
     .. "Aggro gezogen %d"
 L.PROBE_FIGHT = "%s: %s (#%s) Erfolg %s bei %s in %s"
 L.PROBE_DEATHS = "Gespeicherte Gegner-Tode: %d (zuletzt: %s)"
-L.PROBE_SAVED = "Wird mit /reload oder Ausloggen gespeichert (SavedVariables PaTiCompetition.lua)."
+L.PROBE_SAVED = "Wird mit /reload oder Ausloggen gespeichert (SavedVariables PaTiChronicle.lua)."
 L.PROBE_RESET = "Testergebnis gelöscht."
 L.PROBE_RUN_STARTED = "Uhr gestartet: %s"
 L.PROBE_ENCOUNTER = "Bosskampf vorbei: %s (#%s) bei %s"
@@ -34,7 +34,7 @@ L.RESULTS_SUBTITLE = "RUNDENAUSWERTUNG"
 L.RESULTS_SUBTITLE_RUN = "RUNDENAUSWERTUNG · %s · %s"
 L.SAMPLE_VALUES = "Beispielwerte"
 L.SAMPLE_DUNGEON = "Todesminen"
-L.RESULTS_EMPTY = "Noch keine Werte: erst kämpfen, dann /pcomp show."
+L.RESULTS_EMPTY = "Noch keine Werte: erst kämpfen, dann /pchron show."
 L.ROLE_TANK = "Tank"
 L.ROLE_HEALER = "Heiler"
 L.ROLE_DAMAGER = "Schaden"

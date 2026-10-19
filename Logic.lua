@@ -1,4 +1,4 @@
--- PaTiCompetition logic: combat-log entries → totals per group member, plus the probe record (what the client
+-- PaTiChronicle logic: combat-log entries → totals per group member, plus the probe record (what the client
 -- really delivers). Pure: no WoW calls, everything comes in as plain values. Tested in tests/logic_spec.lua.
 local _, ns = ...
 local Logic = {}
