@@ -137,4 +137,21 @@ describe("Logic.Migrate", function()
         assert.equal(12, Logic.Migrate(db).probe.combatLog.total)
         assert.equal(0, Logic.Migrate({ probe = "broken" }).probe.combatLog.total)
     end)
+
+    it("fills the settings, keeps a saved false and repairs a broken scale", function()
+        local Logic = load()
+        local db = Logic.Migrate({ locked = true, scale = "big", theme = "dracula" })
+        assert.same({ true, 1, "dracula", 0.75, "auto" }, { db.locked, db.scale, db.theme, db.opacity, db.language })
+        db.locked = false
+        assert.is_false(Logic.Migrate(db).locked)
+        assert.equal("woforever", Logic.Migrate(nil).theme)
+    end)
+
+    it("restores the default settings and keeps the test results and the position", function()
+        local Logic = load()
+        local db = Logic.Migrate({ scale = 1.25, theme = "dracula", x = 40 })
+        db.probe.combatLog.total = 7
+        Logic.RestoreDefaults(db)
+        assert.same({ 1, "woforever", 40, 7 }, { db.scale, db.theme, db.x, db.probe.combatLog.total })
+    end)
 end)

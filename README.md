@@ -50,8 +50,14 @@ Overview of all addons: [PaTiAdmin](https://github.com/patpaskoch/PaTiAdmin).
 3. Start WoW and enable PaTiCompetition in the AddOns list.
 
 ## Commands
-`/pcomp` or `/paticompetition` — `show` (end screen) · `test` (end screen with example values) ·
-`probe` (test results in the chat) · `reset` (clear and start again) · `version`
+`/pcomp` or `/paticompetition` (end screen on / off) — `show` · `hide` · `test` (test mode: example values on / off) ·
+`lock` · `unlock` · `reset` (window back to its default position) · `settings` · `probe` (test results in the chat) ·
+`clear` (clear the test results and start again) · `version`
+
+## Settings
+••• → Settings (or `/pcomp settings`), like the other PaTi addons: language, scale, lock window, theme (WoForever by
+default), panel opacity, the test mode switch top right and Restore Defaults (keeps the position and the test
+results). ••• also has Lock, Test Mode and Hide.
 
 ## Known limitations
 - No source for damage, healing, interrupts, killing blows and deaths yet: the combat log is reserved for the Blizzard

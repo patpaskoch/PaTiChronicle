@@ -99,8 +99,9 @@ events:SetScript("OnEvent", function(_, event, ...)
     if event == "PLAYER_LOGIN" then
         PaTiCompetitionDB = Logic.Migrate(PaTiCompetitionDB)
         DB = PaTiCompetitionDB
-        UI.SetLanguage("auto")
+        UI.SetLanguage(DB.language)
         window:Attach(DB, 0, 80)
+        window:SetScale(DB.scale)
         noteClient(DB.probe)
         readMembers()
         return
@@ -120,14 +121,17 @@ end)
 
 -- End screen ----------------------------------------------------------------------------------------------------
 
+local testMode = false -- runtime only: the end screen shows the example values (TEST badge)
+
 local function unitOf(name)
     for unit, memberName in pairs(memberUnits) do
         if memberName == name then return unit end
     end
 end
 
--- The current run (or, without a run, everything since the last reset). sample: the example values.
-local function showResults(sample)
+-- The current run (or, without a run, everything since the last clear); in test mode the example values.
+local function showResults()
+    local sample = testMode
     local rows = sample and Score.Sample() or Logic.Ranking(DB.probe)
     if not sample then
         for _, row in ipairs(rows) do
@@ -148,19 +152,74 @@ local function showResults(sample)
     Results.Show(rows, best, { subtitle = subtitle, sample = sample })
 end
 
+local function setShown(shown) -- no secure frames: fine in combat
+    if shown then showResults() else window:Hide() end
+    return true
+end
+
+-- Test mode on: the end screen opens with the example values; off: back to the real ones.
+local function toggleTestMode()
+    testMode = not testMode
+    showResults()
+end
+
+-- Settings -------------------------------------------------------------------------------------------------------
+
+local modal
+
+local function buildSettings()
+    modal = UI.CreateModal("PaTiCompetitionSettings", function() return "PaTiCompetition " .. L.SETTINGS end, 380)
+    local scales = {}
+    for _, scale in ipairs(Logic.SCALES) do
+        scales[#scales + 1] = { value = scale, text = function() return ("%d %%"):format(scale * 100 + 0.5) end }
+    end
+    modal:AddSection("GENERAL")
+    modal:AddRow("LANGUAGE", UI.CreateLanguageDropdown(modal, DB, 170))
+    modal:AddRow("SCALE", UI.CreateDropdown(modal, 170, {
+        items = function() return scales end,
+        get = function() return DB.scale end,
+        set = function(scale) DB.scale = scale; window:SetScale(scale) end,
+    }))
+    modal:AddControls(UI.CreateCheckbox(modal, "LOCK_WINDOW", {
+        get = function() return window:IsLocked() end,
+        set = function(locked) window:SetLocked(locked) end,
+    }))
+    UI.AddWindowSettings(modal, window) -- test switch, theme, panel opacity (PaTiShared)
+    modal:Finish(function()
+        Logic.RestoreDefaults(DB)
+        window:ApplyTheme()
+        window:ApplyOpacity()
+        UI.SetLanguage(DB.language)
+        window:SetLocked(DB.locked)
+        window:SetScale(DB.scale)
+    end)
+end
+
+local function openSettings()
+    if not modal then buildSettings() end
+    modal:Show()
+end
+
 window:SetMenu(function()
     if not DB then return {} end
     return {
+        { text = "SETTINGS", onClick = openSettings },
         { text = window:IsLocked() and "UNLOCK" or "LOCK",
             onClick = function() window:SetLocked(not window:IsLocked()) end },
-        { text = "HIDE", onClick = function() window:Hide() end },
+        { text = "TEST_MODE", checked = testMode, onClick = toggleTestMode },
+        { text = "HIDE", onClick = function() setShown(false) end },
     }
 end)
 -- PaTiSuite "show": the end screen with the current values (an empty window would say nothing).
 window.suiteSetShown = function(shown)
     if not DB then return false end
-    if shown then showResults(false) else window:Hide() end
+    return setShown(shown)
 end
+
+-- Names, roles and numbers are set by showResults: repaint them in the new language.
+UI.OnLanguageChanged(function()
+    if DB and window:IsShown() then showResults() end
+end)
 
 -- Commands -------------------------------------------------------------------------------------------------------
 
@@ -191,18 +250,35 @@ local function printProbe()
     say("PROBE_SAVED")
 end
 
+local function clearProbe()
+    DB.probe = Logic.NewProbe()
+    noteClient(DB.probe)
+    say("PROBE_RESET")
+end
+
+local function resetPosition()
+    DB.point, DB.relativePoint, DB.x, DB.y = nil, nil, nil, nil
+    window:Attach(DB, 0, 80)
+end
+
+-- The same words as the other PaTi addons (reset = window position); clear = forget the test results.
+local COMMANDS = {
+    [""] = function() setShown(not window:IsShown()) end,
+    show = function() setShown(true) end,
+    hide = function() setShown(false) end,
+    test = toggleTestMode,
+    lock = function() window:SetLocked(true) end,
+    unlock = function() window:SetLocked(false) end,
+    reset = resetPosition,
+    settings = openSettings,
+    probe = printProbe,
+    clear = clearProbe,
+    version = function() say("VERSION", addonVersion()) end,
+}
+
 SLASH_PATICOMPETITION1 = "/paticompetition"
 SLASH_PATICOMPETITION2 = "/pcomp"
 SlashCmdList.PATICOMPETITION = function(message)
-    local command = (message or ""):lower():match("^%s*(%S*)")
-    if not DB then return end
-    if command == "probe" then printProbe()
-    elseif command == "show" then showResults(false)
-    elseif command == "test" then showResults(true)
-    elseif command == "reset" then
-        DB.probe = Logic.NewProbe()
-        noteClient(DB.probe)
-        say("PROBE_RESET")
-    elseif command == "version" then say("VERSION", addonVersion())
-    else say("HELP"); say("HELP_MORE") end
+    local command = COMMANDS[(message or ""):match("^%s*(.-)%s*$"):lower()]
+    if command and DB then command() else say("HELP") end
 end

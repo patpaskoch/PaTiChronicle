@@ -38,10 +38,22 @@ Regeln und Eintragen von Ergebnissen: [PaTiAdmin/docs/TESTING.md](https://github
   melden (dann sendet der Client keine Boss-Meldung)
 - [ ] PT-COMP-015 Nach dem Dungeon `/pcomp probe`: Liste der Bosskämpfe mit Name und Nummer (Ausgabe melden;
   daraus entsteht die Endboss-Liste)
-- [ ] PT-COMP-016 `/pcomp reset`: „Testergebnis gelöscht.“, danach zeigt `/pcomp probe` wieder 0 Einträge
+- [ ] PT-COMP-016 `/pcomp clear`: „Testergebnis gelöscht.“, danach zeigt `/pcomp probe` wieder 0 Einträge
 - [ ] PT-COMP-017 In der Gruppe: zieht ein Nicht-Tank Aggro (ein Gegner haut ihn), steht bei `/pcomp probe` hinter
   seinem Namen „Aggro gezogen 1“ (oder mehr) und seine Rolle; beim Tank zählt es auch
   (gibt später aber keine Minuspunkte)
+
+## Einstellungen und Testmodus
+
+- [ ] PT-COMP-030 ••• → Einstellungen (oder `/pcomp settings`): Fenster „PaTiCompetition Einstellungen“ mit Sprache,
+  Größe, Fenster sperren, Farbschema (WoForever), Deckkraft und oben rechts dem Schalter Testmodus; kein Lua-Fehler
+- [ ] PT-COMP-031 Testmodus: ••• → Testmodus, der Schalter in den Einstellungen und `/pcomp test` schalten die
+  Beispielwerte ein (TEST-Abzeichen) und wieder aus (echte Werte); Häkchen stimmt jeweils
+- [ ] PT-COMP-032 Sprache auf Englisch: Titel, Werte-Namen und Rollen auf den Karten wechseln sofort; zurück auf Deutsch
+- [ ] PT-COMP-033 Größe, Farbschema und Deckkraft ändern das Fenster sofort und bleiben nach `/reload`;
+  „Standard wiederherstellen“ setzt alles zurück (WoForever, 100 %), Position und Testergebnis bleiben
+- [ ] PT-COMP-034 `/pcomp` blendet das Fenster ein/aus, `/pcomp hide` / `show`; `/pcomp reset` setzt es an die
+  Standardposition; `/pcomp lock` / `unlock` sperren / entsperren; `/pcomp xyz` zeigt die Hilfe
 
 ## Endbildschirm „Party Competition“
 

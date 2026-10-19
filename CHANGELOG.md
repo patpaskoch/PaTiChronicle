@@ -20,6 +20,11 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 - Interrupts (`SPELL_INTERRUPT`) and killing blows (`PARTY_KILL`, owner question 2026-10-19) per member; a new run
   starts the totals from zero.
 
+- Test mode and settings like the other PaTi addons (owner wish 2026-10-19): ••• → Settings / `/pcomp settings`
+  with language, scale, lock window, theme, panel opacity, test switch and Restore Defaults; ••• → Test Mode;
+  `/pcomp test` switches the example values on and off. Commands `hide`, `lock`, `unlock`, `settings`; `reset` now
+  moves the window back to its default position (as everywhere), `clear` clears the test results.
+
 ### Removed
 - The combat log is no longer read (owner screenshot 2026-10-19: "PaTiCompetition wurde geblockt"): this client
   reserves `COMBAT_LOG_EVENT_UNFILTERED` for the Blizzard UI. The test run now checks for `C_DamageMeter` instead.

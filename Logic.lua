@@ -163,13 +163,34 @@ function Logic.Ranking(probe)
     return list
 end
 
--- SavedVariables: { schema, probe, theme, window position }. Unknown or broken values are replaced;
--- a saved probe is kept.
+Logic.SCALES = { 0.8, 0.9, 1, 1.1, 1.25 }
+
+-- The settings (owner 2026-10-19: "Einstellungen wie die anderen"); like PaTiDungeon's.
+Logic.DEFAULTS = {
+    opacity = 0.75, -- panel body opacity (PaTiShared window; 0.3–1)
+    theme = "woforever", -- gold and bronze, like the owner's end screen design
+    locked = false,
+    scale = 1,
+    language = "auto",
+}
+
+-- SavedVariables: { schema, probe, settings (DEFAULTS), window position }. Unknown or broken values are replaced;
+-- a saved probe is kept. Schema 1 stays: the settings are only new keys with defaults.
 function Logic.Migrate(db)
     if type(db) ~= "table" then db = {} end
     if type(db.probe) ~= "table" or type(db.probe.combatLog) ~= "table" then db.probe = Logic.NewProbe() end
-    if db.theme == nil then db.theme = "woforever" end -- gold and bronze, like the owner's end screen design
+    for key, value in pairs(Logic.DEFAULTS) do
+        if db[key] == nil then db[key] = value end
+    end
+    -- A broken scale would make SetScale fail on login: only a sane number is kept.
+    if type(db.scale) ~= "number" or db.scale < 0.5 or db.scale > 2 then db.scale = Logic.DEFAULTS.scale end
     db.schema = Logic.SCHEMA
+    return db
+end
+
+-- "Restore Defaults": the settings back; position and the test results stay.
+function Logic.RestoreDefaults(db)
+    for key, value in pairs(Logic.DEFAULTS) do db[key] = value end
     return db
 end
 

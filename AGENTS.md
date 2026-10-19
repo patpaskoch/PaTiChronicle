@@ -17,7 +17,9 @@ Addon facts: `../../PaTiAdmin/docs/ARCHITECTURE.md` · open issues: `../../PaTiA
 - Secret values: an entry with a secret field is only counted (`combatLog.secret`), never added up or printed.
 - SavedVariables: `PaTiCompetitionDB` (per character), schema 1 — `probe` (see `Logic.NewProbe`). Any shape change:
   bump `Logic.SCHEMA`, add a migration step and a test.
-- Secure / combat-sensitive: none. Slash commands: `/pcomp`, `/paticompetition`.
+- Secure / combat-sensitive: none. Slash commands: `/pcomp`, `/paticompetition` (command table like PaTiDungeon).
+- Settings like PaTiDungeon (`Logic.DEFAULTS`, `Logic.RestoreDefaults`, `UI.AddWindowSettings`); test mode is runtime
+  only (the end screen with `Score.Sample`).
 - Score formula: `Score.lua` header and README must say the same; change both together.
 
 ## Checks
