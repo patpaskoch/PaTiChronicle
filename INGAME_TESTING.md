@@ -26,6 +26,9 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   AddOn-Liste mit Beschreibung („Jeder Run erzählt eine Geschichte …“); der alte Ordner `PaTiCompetition` ist weg
 - [ ] PT-CHRON-002 `/reload` ohne Lua-Fehler; `/pchron` und `/patichronicle` antworten, `/pchron version` zeigt 0.2.0
 - [ ] PT-CHRON-003 Der alte Befehl `/pcomp` funktioniert noch genauso wie `/pchron`
+- [ ] PT-CHRON-005 Noch kein Run: PaTiSuite „alle zeigen“ und `/pchron` öffnen das Fenster mit „Noch kein Run …“;
+  keine Meldung „Chronicle: im Kampf nicht möglich“, keine Chat-Zeile; der Knopf „Testmodus: Beispiel-Run ansehen“
+  zeigt den Beispiel-Run (TEST-Abzeichen), ••• → Testmodus wieder aus → zurück zum Hinweis
 - [ ] PT-CHRON-004 Übernommene Daten: Farbschema, Größe und Sprache wie vorher bei PaTiCompetition
 
 ## API-Prüfung (Probe, Tests T1–T7)

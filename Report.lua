@@ -348,9 +348,40 @@ end
 
 Report.views.overview = fillOverview
 
+-- No run yet: the window opens with a short note instead of the tabs (owner 2026-10-19: "show all" from PaTiSuite
+-- must not answer "not possible", and no chat line each time).
+local emptyNote = Report.Text(window, Report.FONT_LARGE, "TextMuted")
+emptyNote:SetPoint("CENTER", 0, -UI.Spacing.LG)
+emptyNote:SetWidth(Report.CONTENT_WIDTH - 2 * Report.PAD)
+UI.BindText(emptyNote, "NO_REPORT")
+emptyNote:Hide()
+-- One click into test mode (owner 2026-10-19); Report.onSample is set by PaTiChronicle.lua.
+local sampleButton = UI.CreateButton(window, "SHOW_SAMPLE", nil, function()
+    if Report.onSample then Report.onSample() end
+end)
+sampleButton:SetPoint("TOP", emptyNote, "BOTTOM", 0, -UI.Spacing.LG)
+sampleButton:Hide()
+
+local function setEmpty(empty)
+    emptyNote:SetShown(empty)
+    sampleButton:SetShown(empty)
+    for _, button in pairs(tabButtons) do button:SetShown(not empty) end
+    if empty then
+        for _, page in pairs(pages) do page:Hide() end
+    end
+end
+
+function Report.ShowEmpty()
+    shownReport = nil
+    setEmpty(true)
+    window:SetTestMode(false)
+    window:Show()
+end
+
 -- report: { run, result, names, units?, best?, sample? } (PaTiChronicle.lua builds it; Sample.lua for test mode).
 function Report.Show(report, tab)
     shownReport = report
+    setEmpty(false)
     for _, fill in pairs({ Report.views.overview, Report.views.mine, Report.views.timeline }) do fill(report) end
     window:SetTestMode(report.sample == true)
     Report.SelectTab(tab or current or "overview")

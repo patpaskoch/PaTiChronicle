@@ -186,7 +186,7 @@ end
 local function setShown(shown) -- no secure frames: fine in combat
     if not shown then window:Hide(); return true end
     local report = currentReport()
-    if not report then say("NO_REPORT"); return false end
+    if not report then Report.ShowEmpty(); return true end
     showReport(report)
     return true
 end
@@ -355,11 +355,11 @@ ns.Commands = { -- for Settings.lua
     toggleTest = function()
         testMode = not testMode
         if testMode or window:IsShown() then setShown(true) end
-        if not testMode and not currentReport() then window:Hide() end
     end,
     isTest = function() return testMode end,
     db = function() return DB end,
     noteClient = noteClient,
     version = addonVersion,
 }
+Report.onSample = ns.Commands.toggleTest
 UI.OnLanguageChanged(Report.Refresh)

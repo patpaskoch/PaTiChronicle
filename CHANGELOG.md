@@ -29,6 +29,11 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 - The end screen with five player cards, seven values, points per value and the score 0–100 (`Score.lua`,
   `Results.lua`); the combat-log parser.
 
+### Fixed
+- Without a run yet, PaTiSuite "show all" said "Chronicle: not possible in combat" and a chat line came each time
+  (owner screenshot 2026-10-19): the report window now opens with the note "No run yet …" instead, with a button
+  "Test mode: view an example run".
+
 ### Known Issues
 - Not tested in game. Boss events, readable threat and death states are unconfirmed (probe, PT-CHRON-010…016);
   achievements that need them stay "not checkable" until then. No icon yet.
