@@ -137,7 +137,8 @@ UI.BindText(note, "CONTRIBUTION_NOTE")
 
 -- One cell: a number, a clock, "-" (nothing to show: 0 seconds dead, attacks of a tank) or "n/a" + reason.
 local function fillCell(cell, column, value, reason)
-    local text, color, tip = nil, "Text", nil
+    local text, color, tip
+    color = "Text"
     if value == nil then
         if reason == "TANK" then text, color, tip = "-", "TextMuted", L.NA_TANK
         else text, color, tip = L.NA, "TextMuted", L["NA_" .. (reason or "DATA")] end
