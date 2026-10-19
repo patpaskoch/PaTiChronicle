@@ -62,18 +62,47 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 
 ## Run-Bericht
 
-- [ ] PT-CHRON-030 `/pchron test`: Übersicht „Die Todesminen“, „abgeschlossen in 24:13“, „NEUE BESTZEIT · 0:48
+- ~~PT-CHRON-030 `/pchron test`: Übersicht „Die Todesminen“, „abgeschlossen in 24:13“, „NEUE BESTZEIT · 0:48
   schneller“, fünf Porträts (Initialen), Namen in Klassenfarbe mit „21 Krieger“ usw.; GEMEINSAM: Neue Bestzeit,
-  Eingespieltes Team, Kein Wipe; DEIN HIGHLIGHT: Standhaft (5 Runs in Folge), Saubere Aggro; Streifen; TEST-Abzeichen
-- [ ] PT-CHRON-031 Symbole sichtbar (kein grünes Fragezeichen): Erfolge, Totenkopf/Kreuz/Dreieck im Streifen
+  Eingespieltes Team, Kein Wipe; DEIN HIGHLIGHT: Standhaft (5 Runs in Folge), Saubere Aggro; Streifen; TEST-Abzeichen~~
+  - RETIRED 2026-10-19 – Übersicht neu gestaltet (Redesign), ersetzt durch PT-CHRON-060
+- [ ] PT-CHRON-031 Symbole sichtbar (kein grünes Fragezeichen): Erfolge, Totenkopf (Boss), rotes Kreuz (Tod) und
+  oranger Kreis (Aggro) in Zeitleiste und Liste
 - [ ] PT-CHRON-032 Tooltips: Erfolg → Regel; Markierung im Streifen → Zeit und Ereignis; „! n nicht prüfbar“ → Gründe
-- [ ] PT-CHRON-033 Reiter „Meine Leistung“: Kael · Schaden · 20 Magier; Erfolge; Entwicklung (Laufzeit, Tode,
-  Aggro-Momente) mit Schnitt, kleinen Balken und „besser als dein Schnitt“ in Grün
-- [ ] PT-CHRON-034 Reiter „Verlauf“: Streifen, Legende, „16 Kämpfe · 3 Bosskämpfe · im Kampf …“, Liste mit Bossen,
-  Toden, „Aggro-Moment (Gruppe)“ und „Run abgeschlossen“; nichts überlappt oder ist abgeschnitten
+- ~~PT-CHRON-033 Reiter „Meine Leistung“: Kael · Schaden · 20 Magier; Erfolge; Entwicklung (Laufzeit, Tode,
+  Aggro-Momente) mit Schnitt, kleinen Balken und „besser als dein Schnitt“ in Grün~~
+  - RETIRED 2026-10-19 – keine Mini-Balken mehr (Redesign), ersetzt durch PT-CHRON-064
+- ~~PT-CHRON-034 Reiter „Verlauf“: Streifen, Legende, „16 Kämpfe · 3 Bosskämpfe · im Kampf …“, Liste mit Bossen,
+  Toden, „Aggro-Moment (Gruppe)“ und „Run abgeschlossen“; nichts überlappt oder ist abgeschnitten~~
+  - RETIRED 2026-10-19 – Verlauf neu gestaltet (Redesign), ersetzt durch PT-CHRON-066
 - [ ] PT-CHRON-035 Farbschemata Standard, WoForever und Dracula: alles lesbar, Reiter-Unterstrich in Akzentfarbe
 - [ ] PT-CHRON-036 Nach einem echten Run: Bericht mit echten Porträts und deinen Werten; niemand hat Punkte oder Rang
 - [ ] PT-CHRON-037 Esc schließt den Bericht; am Kopf verschiebbar; Position bleibt nach `/reload`
+
+## Redesign (Game-Results-Screen)
+
+- [ ] PT-CHRON-060 `/pchron test`, Übersicht: oben „DUNGEON ABGESCHLOSSEN“, groß „Die Todesminen“, sehr groß „24:13“,
+  darunter „NEUE BESTZEIT · 0:48 schneller“ in Akzentfarbe; fünf Porträts mit Namen in Klassenfarbe und „Klasse · Rolle“;
+  GEMEINSAM GESCHAFFT mit drei Erfolgen (Begründung in bis zu zwei Zeilen, nichts abgeschnitten); HIGHLIGHTS mit
+  „2 Tode im 10. Kampf“ und „Längster Kampf: Edwin VanCleef, 1:53“
+- [ ] PT-CHRON-061 Schrift deutlich größer als vorher; nichts gequetscht, keine großen Leerflächen; Fenster deckt die
+  Spielwelt ab (keine Namensschilder scheinen durch, Deckkraft 100 %)
+- [ ] PT-CHRON-062 Reiter als Text mit Unterstrich (keine Knöpfe): Übersicht, Gruppenergebnis, Meine Leistung,
+  Verlauf; Maus darüber hellt auf; aktiver Reiter unterstrichen
+- [ ] PT-CHRON-063 Gruppenergebnis: fünf Mitglieder nebeneinander (3D-Figur, wenn die Probe „ok“ meldet, sonst Porträt),
+  Name, Klasse mit Stufe, Rolle in Rollenfarbe; Tabelle in fester Reihenfolge Tank, Heiler, Schaden: TODE, ZEIT TOT,
+  ANGRIFFE 3 S+, DABEI; Korr 1 / 0:42 / 1, Nyra 1 / 0:39; Arden bei Angriffen „-“; deine Zeile mit Strich und „(du)“;
+  Zeile „Gruppe“ mit „kein Wipe“; Reiter „Beitrag“ ausgegraut mit Tooltip
+- [ ] PT-CHRON-064 Klick auf ein Porträt in der Übersicht öffnet das Gruppenergebnis; Klick auf eine Zeile oder Figur
+  zeigt darunter die Zeiten („Korr: gestorben 14:05 · angegriffen 9:13“); „n. v.“-Felder erklären im Tooltip warum
+- [ ] PT-CHRON-065 Meine Leistung: großer Name in Klassenfarbe, „Magier · Schaden · Stufe 20“; DARAUF KANNST DU STOLZ
+  SEIN mit drei Erfolgen; DEINE ENTWICKLUNG ohne Balken: „Laufzeit 24:13 – 2:29 schneller als dein Schnitt (26:42)“
+  mit „dein bester Run hier“, Tode, Aggro-Momente; HIER IST NOCH LUFT: „Nichts aufgefallen – ein sauberer Run.“
+- [ ] PT-CHRON-066 Verlauf: Zeitleiste mit Zeitachse (0:00, 5:00, … 24:13), Bosskämpfe in Akzentfarbe, Symbole darüber
+  (nahe gleiche zusammengefasst mit „×2“); Liste mit sauber ausgerichteten Zeiten, Linie zwischen Kämpfen; rechts DETAIL
+  mit dem ersten Tod (Kampf 10, Dauer, „Im selben Kampf: … Korr gestorben“)
+- [ ] PT-CHRON-067 Klick auf eine Zeile oder ein Symbol der Zeitleiste zeigt rechts dessen Details; die Zeile ist markiert
+- [ ] PT-CHRON-068 Alle drei Farbschemata (Standard, WoForever, Dracula): alles lesbar, getönte Tabellenzeilen sichtbar
 
 ## Run-Uhr
 

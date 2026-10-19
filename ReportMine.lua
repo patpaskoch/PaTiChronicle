@@ -1,109 +1,79 @@
--- PaTiChronicle run report, tab "My performance": your achievements in this run and your development against your
--- own earlier runs in this dungeon and role (Chronicle.Development). Better shows in the success colour, worse only
--- as a plain "above your average" — never red, never a ranking (owner decision 2026-10-19).
+-- PaTiChronicle run report, tab "My performance": what you can be proud of (your achievements), your development
+-- against your own earlier runs in this dungeon and role (Chronicle.Development), and where there is room left.
+-- Redesign 2026-10-19: no mini bar charts — every value with its change in words and numbers. Better in the success
+-- colour, worse only as a plain sentence (never red, never a ranking).
 local _, ns = ...
-local UI, L, Logic, Chronicle, Report = ns.UI, ns.UI.L, ns.Logic, ns.Chronicle, ns.Report
-
-local MAX_ACHIEVEMENTS = 4
-local BAR_WIDTH, BAR_GAP, BAR_MAX = 6, 2, 16 -- the small history bars (last runs)
-local STATE_COLOR = { better = "Success", same = "TextMuted", worse = "TextMuted", few = "TextMuted",
-    missing = "TextMuted" }
+local UI, L, Chronicle, Report = ns.UI, ns.UI.L, ns.Chronicle, ns.Report
 
 local page = Report.pages.mine
 local width = Report.CONTENT_WIDTH
+local MAX_PROUD = 3
+local MAX_ROOM = 2
+local VALUE_X, CHANGE_X = 150, 250
+local METRIC_TEXT = { time = "DEV_TIME", deaths = "DEV_DEATHS", aggro = "DEV_AGGRO" }
 
-local portrait = Report.Portrait(page, 40)
-portrait.ring:SetPoint("TOPLEFT", 0, -UI.Spacing.SM)
-local name = Report.Text(page, Report.FONT_LARGE)
-name:SetPoint("TOPLEFT", portrait.ring, "TOPRIGHT", UI.Spacing.MD, -2)
-local roleLine = Report.Text(page, UI.Fonts.Text, "TextMuted")
-roleLine:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -2)
-local runLine = Report.Text(page, UI.Fonts.Text, "TextMuted")
-runLine:SetPoint("TOPLEFT", roleLine, "BOTTOMLEFT", 0, -2)
+local portrait = Report.Portrait(page, 48)
+portrait.ring:SetPoint("TOPLEFT", 0, -2)
+local name = Report.Text(page, "Display")
+name:SetPoint("TOPLEFT", portrait.ring, "TOPRIGHT", 14, -2)
+local roleLine = Report.Text(page, "Body", "TextMuted")
+roleLine:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -4)
+local runLine = Report.Text(page, "Caption", "TextMuted")
+runLine:SetPoint("TOPLEFT", roleLine, "BOTTOMLEFT", 0, -3)
 
-local y = -76
-local achievementsTitle = Report.SectionTitle(page, 0, y)
-UI.BindText(achievementsTitle, "SECTION_ACHIEVEMENTS")
-local noAchievement = Report.Text(page, UI.Fonts.Text, "TextMuted")
-noAchievement:SetPoint("TOPLEFT", 0, y - 18)
+local y = -84
+Report.Divider(page, y)
+Report.SectionTitle(page, 0, y - 16, "SECTION_PROUD")
+local missingNote = Report.MissingNote(page)
+missingNote:SetPoint("TOPRIGHT", 0, y - 14)
+local noAchievement = Report.Text(page, "Body", "TextMuted")
+noAchievement:SetPoint("TOPLEFT", 0, y - 38)
 UI.BindText(noAchievement, "NONE_MINE")
-local achievements = {}
-for index = 1, MAX_ACHIEVEMENTS do
-    local entry = Report.Achievement(page, width)
-    entry:SetPoint("TOPLEFT", 0, y - 18 - (index - 1) * 32)
-    achievements[index] = entry
+local proud = {}
+local medallion = (width - 2 * 16) / 3
+for index = 1, MAX_PROUD do
+    local entry = Report.Medallion(page, medallion)
+    entry:SetPoint("TOPLEFT", (index - 1) * (medallion + 16), y - 38)
+    proud[index] = entry
 end
 
-y = y - 18 - MAX_ACHIEVEMENTS * 32 - UI.Spacing.MD
-local developmentTitle = Report.SectionTitle(page, 0, y)
-UI.BindText(developmentTitle, "SECTION_DEVELOPMENT")
-local lastRuns = Report.Text(page, UI.Fonts.Label, "TextMuted")
-lastRuns:SetPoint("TOPRIGHT", 0, y)
-UI.BindText(lastRuns, function() return L.LAST_RUNS:format(Chronicle.TREND_RUNS) end)
+y = y - 38 - Report.MEDALLION_HEIGHT - Report.GAP
+Report.SectionTitle(page, 0, y, "SECTION_DEVELOPMENT")
+local compared = Report.Text(page, "Caption", "TextMuted")
+compared:SetPoint("TOPRIGHT", 0, y)
+Report.Divider(page, y - 18)
 
-local METRIC_TEXT = { time = "DEV_TIME", deaths = "DEV_DEATHS", aggro = "DEV_AGGRO" }
 local rows = {}
 for index = 1, 3 do
     local row = CreateFrame("Frame", nil, page)
-    row:SetSize(width, 34)
-    row:SetPoint("TOPLEFT", 0, y - 18 - (index - 1) * 36)
-    row.label = Report.Text(row, UI.Fonts.Text, "Text")
-    row.label:SetPoint("TOPLEFT", 0, -2)
-    row.value = Report.Text(row, UI.Fonts.Title, "Text")
-    row.value:SetPoint("TOPLEFT", 150, -2)
-    row.avg = Report.Text(row, UI.Fonts.Text, "TextMuted")
-    row.avg:SetPoint("TOPLEFT", 240, -2)
-    row.state = Report.Text(row, UI.Fonts.Label, "TextMuted")
-    row.state:SetPoint("TOPLEFT", 240, -18)
-    row.bars = {}
-    for bar = 1, Chronicle.TREND_RUNS do
-        local texture = row:CreateTexture(nil, "ARTWORK")
-        texture:SetWidth(BAR_WIDTH)
-        texture:SetPoint("BOTTOMRIGHT", row, "TOPRIGHT",
-            -(Chronicle.TREND_RUNS - bar) * (BAR_WIDTH + BAR_GAP), -BAR_MAX - 2)
-        row.bars[bar] = texture
-    end
-    local line = row:CreateTexture(nil, "ARTWORK")
-    line:SetPoint("BOTTOMLEFT")
-    line:SetSize(width, 1)
-    UI.Paint(line, "SetColorTexture", "Border")
+    row:SetSize(width, 44)
+    row:SetPoint("TOPLEFT", 0, y - 26 - (index - 1) * 46)
+    row.label = Report.Text(row, "Body", "TextMuted")
+    row.label:SetPoint("TOPLEFT", 0, -4)
+    row.value = Report.Text(row, "Heading", "Text")
+    row.value:SetPoint("TOPLEFT", VALUE_X, -2)
+    row.change = Report.Text(row, "Body", "Text")
+    row.change:SetPoint("TOPLEFT", CHANGE_X, -4)
+    row.change:SetWidth(width - CHANGE_X)
+    row.change:SetJustifyH("LEFT")
+    row.best = Report.Text(row, "Caption", "Accent")
+    row.best:SetPoint("TOPLEFT", row.change, "BOTTOMLEFT", 0, -4)
     rows[index] = row
 end
 
-local missingNote = Report.MissingNote(page)
-missingNote:SetPoint("BOTTOMLEFT", 0, 0)
-
-local function show(metric, value)
-    if value == nil then return "-" end
-    if metric == "time" then return Logic.Clock(value) end
-    if math.floor(value) == value then return tostring(value) end
-    return (("%.1f"):format(value):gsub("%.", L.DECIMAL))
+y = y - 26 - 3 * 46 - 4
+Report.Divider(page, y)
+Report.SectionTitle(page, 0, y - 16, "SECTION_ROOM")
+local room = {}
+for index = 1, MAX_ROOM do
+    local line = Report.Text(page, "Body", "Text")
+    line:SetPoint("TOPLEFT", 0, y - 36 - (index - 1) * 22)
+    line:SetWidth(width)
+    line:SetJustifyH("LEFT")
+    room[index] = line
 end
 
--- The last runs as small bars (the newest = this run, in the accent colour); taller = more (time, deaths, aggro).
-local function fillBars(row, trend)
-    local most = 0
-    for _, value in ipairs(trend) do most = math.max(most, value) end
-    local first = Chronicle.TREND_RUNS - #trend
-    for index, texture in ipairs(row.bars) do
-        local value = trend[index - first]
-        if value then
-            texture:SetHeight(math.max(2, most > 0 and value / most * BAR_MAX or 2))
-            UI.Paint(texture, "SetColorTexture", index == Chronicle.TREND_RUNS and "Accent" or "TextMuted", 0.8)
-            texture:Show()
-        else
-            texture:Hide()
-        end
-    end
-end
-
-local function stateText(row, reason)
-    if row.state == "missing" then return L["DEV_MISSING_" .. reason] end
-    if row.state == "few" then return L.DEV_FEW:format(Chronicle.MIN_COMPARE - row.earlier) end
-    return L["DEV_" .. row.state:upper()]
-end
-
--- Why a value is missing: the run had gaps, the data was not readable, or (aggro) your role is unknown.
+-- Why a value is missing: the run had gaps, the data was not readable, or (aggro) your role or the tank is unknown.
 local function missingReason(run, metric)
     if metric == "time" then return "NOT_COUNTED" end
     if not run.complete then return "GAP" end
@@ -111,31 +81,70 @@ local function missingReason(run, metric)
     return "DATA"
 end
 
+-- "2:29 faster than your average (26:42)", "1.8 less than your average", "like your average (0.2)".
+local function changeText(row)
+    local value, avg = row.value, row.avg
+    if row.state == "few" then return L.DEV_FEW:format(Chronicle.MIN_COMPARE - row.earlier), "TextMuted" end
+    local clock = row.metric == "time"
+    local shownAvg = Report.Value(row.metric, avg)
+    local difference = Report.Value(row.metric, math.abs(value - avg))
+    if row.state == "better" then
+        return (clock and L.CHANGE_TIME_BETTER or L.CHANGE_COUNT_BETTER):format(difference, shownAvg), "Success"
+    elseif row.state == "worse" then
+        return (clock and L.CHANGE_TIME_WORSE or L.CHANGE_COUNT_WORSE):format(difference, shownAvg), "TextMuted"
+    end
+    return L.CHANGE_SAME:format(shownAvg), "TextMuted"
+end
+
+local ROOM_TEXT = { time = "ROOM_TIME", deaths = "ROOM_DEATHS", aggro = "ROOM_AGGRO" }
+
 Report.views.mine = function(report)
     local run, result = report.run, report.result
     local me = run.members[run.me] or { name = run.me }
     portrait:Set(run.me, run.myRole, report.units and report.units[run.me])
     name:SetText(run.me or "")
     Report.ClassColor(name, me.classFile)
-    local roleText = L[Report.ROLE_TEXT[run.myRole] or "ROLE_NONE"]
-    local levelClass = Report.LevelClass(me)
-    roleLine:SetText(levelClass ~= "" and ("%s · %s"):format(roleText, levelClass) or roleText)
+    local parts = { Report.ClassName(me), L[Report.ROLE_TEXT[run.myRole] or "ROLE_NONE"],
+        me.level and L.LEVEL:format(me.level) or nil }
+    local line = {}
+    for _, part in ipairs(parts) do if part then line[#line + 1] = part end end
+    roleLine:SetText(table.concat(line, " · "))
     runLine:SetText(L.RUN_NUMBER:format(run.name or "", report.runNumber or 1))
 
-    for index, entry in ipairs(achievements) do
+    for index, entry in ipairs(proud) do
         if result.mine[index] then entry:Set(result.mine[index]) else entry:Hide() end
     end
     noAchievement:SetShown(#result.mine == 0)
+    missingNote:Set(result.missing)
 
+    local earlierRuns, roomLines = 0, {}
     for index, row in ipairs(rows) do
         local data = result.development[index]
+        earlierRuns = math.max(earlierRuns, data.earlier or 0)
         row.label:SetText(L[METRIC_TEXT[data.metric]])
-        row.value:SetText(show(data.metric, data.value))
-        row.avg:SetText(data.avg and data.state ~= "few" and data.state ~= "missing"
-            and L.DEV_AVERAGE:format(show(data.metric, data.avg)) or "")
-        row.state:SetText(stateText(data, missingReason(run, data.metric)))
-        UI.Paint(row.state, "SetTextColor", STATE_COLOR[data.state] or "TextMuted")
-        fillBars(row, data.value ~= nil and data.trend or {})
+        row.value:SetText(Report.Value(data.metric, data.value))
+        UI.Paint(row.value, "SetTextColor", data.value == nil and "TextMuted" or "Text")
+        local text, color
+        if data.state == "missing" then
+            text, color = L["DEV_MISSING_" .. missingReason(run, data.metric)], "TextMuted"
+        else
+            text, color = changeText(data)
+        end
+        row.change:SetText(text)
+        UI.Paint(row.change, "SetTextColor", color)
+        row.best:SetText(data.best and L.BEST_HERE or "")
+        if data.state == "worse" and #roomLines < MAX_ROOM then
+            roomLines[#roomLines + 1] = L[ROOM_TEXT[data.metric]]:format(Report.Value(data.metric, data.value),
+                Report.Value(data.metric, data.avg))
+        end
     end
-    missingNote:Set(result.missing)
+    compared:SetText(earlierRuns > 0 and L.COMPARED_WITH:format(earlierRuns) or "")
+    if #roomLines == 0 then
+        roomLines[1] = earlierRuns >= Chronicle.MIN_COMPARE and L.ROOM_NONE or L.ROOM_FEW
+    end
+    for index, text in ipairs(room) do
+        text:SetText(roomLines[index] or "")
+        UI.Paint(text, "SetTextColor", (#roomLines == 1 and index == 1 and roomLines[1] == L.ROOM_NONE)
+            and "TextMuted" or "Text")
+    end
 end

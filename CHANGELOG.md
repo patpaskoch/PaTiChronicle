@@ -32,6 +32,23 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 - The end screen with five player cards, seven values, points per value and the score 0–100 (`Score.lua`,
   `Results.lua`); the combat-log parser.
 
+### Changed
+- Redesign of the run report (owner approval 2026-10-19): a game results screen instead of a dashboard. Four tabs as
+  text tabs with an accent underline — Overview, **Group result** (new), My performance, Timeline. Five type levels
+  (Blizzard fonts, bigger than before), one grid (20 px edges, 24 px between sections, 30 px rows), one strong element
+  per tab, no boxes inside the page. Window 640 × 560; the report is fully opaque (the opacity setting is the real
+  cover; a saved 0.75 — the old default — becomes 1 once).
+- Overview: completion kicker, dungeon, the run time large, new best time, the group, achievements as medallions, two
+  highlights by fixed rules (most deaths in a fight or a wipe, the longest fight).
+- Group result: the five members side by side (3D character where the probe confirmed it, else the portrait), a calm
+  table in fixed order — deaths, time dead, attacks of 3 s or more, time in the group, the group total; a click shows
+  the times. "Contribution" (damage, healing, interrupts) stays off until C_DamageMeter is confirmed. Missing values:
+  "n/a" with the reason.
+- My performance: no mini bar charts; every value with its change in words ("2:29 faster than your average"), "your
+  best run here", and "room to grow" for values above your average.
+- Timeline: time axis, clustered symbols, aligned times, a line between fights, a detail column for the chosen event.
+  Aggro is now the orange circle (the green triangle read as "good").
+
 ### Fixed
 - Without a run yet, PaTiSuite "show all" said "Chronicle: not possible in combat" and a chat line came each time
   (owner screenshot 2026-10-19): the report window now opens with the note "No run yet …" instead, with a button

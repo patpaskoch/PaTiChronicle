@@ -12,14 +12,19 @@ survival and personal bests. We play together against our own earlier runs — n
 > (`/pchron probe`); achievements that need data the client does not deliver are never given.
 
 ## The run report
-Opens when a run ends (or with `/pchron`). Three tabs, first the shared success, then your part, then the details:
-- **Overview** — dungeon, run time, new best time, the group (portrait, name in class colour, level and class — no
-  numbers per person, no ranking), group achievements, your highlight and the run as a strip.
-- **My performance** — your achievements in this run and your development: run time, your deaths, your aggro
-  moments (tank: the group's), each against your own average of your last runs in this dungeon and role.
-  Better shows as "better than your average", worse only as "above your average".
-- **Timeline** — the run as a strip (fights, boss fights, deaths, aggro moments) and the list of what happened, with
-  time and fight number. Who died is named; causes never. Aggro moments carry a name only when they were yours.
+Opens when a run ends (or with `/pchron`). A calm results screen with four tabs — first the shared success, then
+the group, then your part, then the details:
+- **Overview** — completed, the dungeon, the run time large, a new best time, the group (portrait, name in class
+  colour, class and role), achievements as medallions and two highlights of the run.
+- **Group result** — the five members side by side (a 3D character where the client allows it, else the portrait)
+  and a table in fixed order (tank, healer, damage — never sorted by values): deaths, time dead, attacks of 3 s or
+  more, time in the group, the group total. A click shows the times. Damage, healing and interrupts only once the
+  client's damage meter is confirmed. Missing values show "n/a" with the reason — never 0.
+- **My performance** — what you can be proud of (your achievements), your development against your own average in
+  this dungeon and role (in words: "2:29 faster than your average", "your best run here") and where there is room.
+- **Timeline** — the run on a time axis (fights, boss fights, deaths, aggro moments), the list of what happened and
+  the details of the chosen event. Who died is named; causes never. Aggro moments carry a name only when they were
+  yours.
 
 ## Run rules
 - **Start:** the first fight inside a 5-player dungeon.
