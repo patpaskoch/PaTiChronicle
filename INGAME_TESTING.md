@@ -140,6 +140,10 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   hervorgehoben; zurück zu „Überleben“ zeigt wieder Tode usw.
 - [ ] PT-CHRON-076 Nach einem echten Run: „Beitrag“ zeigt Zahlen für alle Mitglieder; ungefähr wie WoWs eigener
   Schadensmesser über den ganzen Run (Gesamt); dein eigener Blizzard-Schadensmesser wird nie zurückgesetzt
+  - ❌ FAIL 2026-10-21 (Owner: Schaden, Heilung usw. werden am Ende nicht angezeigt; gespeichert waren 80 leere Kämpfe)
+  - 🔧 FIX IMPLEMENTED 2026-10-21 (nach jedem Kampf auch über „Current“ gelesen, leere Lesungen nie gespeichert;
+    `run.meter.diag` zeigt, was WoW geliefert hat)
+  - MANUAL RETEST REQUIRED
 - [ ] PT-CHRON-077 Run endet von selbst beim Endboss (noch im Kampf): nach dem Kampf enthält „Beitrag“ auch den
   Endboss-Kampf (Bericht aktualisiert sich); ein älterer Run zeigt „n. v.“ mit Grund im Tooltip
 

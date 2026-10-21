@@ -357,10 +357,10 @@ events:SetScript("OnEvent", function(_, event, ...)
         if DB.run then
             Run.FightEnd(DB.run, time(), GetTime())
             Probe.DamageMeter(DB.probe, false)
-            Meter.Read(DB.run)
+            Meter.Read(DB.run, true)
         end
         if meterAfterRun then
-            Meter.Read(meterAfterRun)
+            Meter.Read(meterAfterRun, true)
             meterAfterRun = nil
             Report.Refresh()
         end

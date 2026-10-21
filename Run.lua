@@ -283,14 +283,17 @@ function Run.MeterStart(run, before)
     run.meter = { before = before or {}, sessions = {}, count = 0 }
 end
 
+-- Stores one session snapshot; true when stored. A snapshot without any member (WoW returned no players) is never
+-- stored: it would replace a good earlier read of the same session.
 function Run.MeterSession(run, id, values)
     local meter = run.meter
-    if not meter or meter.before[id] then return end
+    if not meter or meter.before[id] or next(values) == nil then return false end
     if not meter.sessions[id] then
-        if meter.count >= Run.MAX_SESSIONS then return end
+        if meter.count >= Run.MAX_SESSIONS then return false end
         meter.count = meter.count + 1
     end
     meter.sessions[id] = values
+    return true
 end
 
 -- { [name] = { damage = n, … } } summed over the run's sessions; nil without readable meter data.
@@ -304,6 +307,7 @@ function Run.MeterTotals(run)
             for kind, amount in pairs(kinds) do sum[kind] = (sum[kind] or 0) + amount end
         end
     end
+    if next(totals) == nil then return nil end -- earlier versions kept empty snapshots
     return totals
 end
 

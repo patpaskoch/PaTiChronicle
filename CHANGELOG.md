@@ -9,6 +9,10 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
   Test mode has example values.
 
 ### Fixed
+- Contribution stayed empty after a real run (owner 2026-10-21): every fight read by its session ID came back
+  without a single member. Right after each fight the newest fight is now also read by type (Current), the way the
+  probe saw the players; an empty read never replaces a stored one, and a run with only empty reads shows "n/a"
+  instead of 0. That run itself cannot be repaired (nothing was stored).
 - A member's changed role, class or level during a run is now taken over (owner 2026-10-19: the healer change was
   not shown); before, the first reading stayed.
 - A wipe was not counted when your own death ended combat before the last member died (owner 2026-10-19): it
