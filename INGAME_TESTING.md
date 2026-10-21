@@ -22,14 +22,18 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 
 ## Installation / Laden
 
-- [ ] PT-CHRON-001 Login ohne Lua-Fehler und ohne Fenster „wurde geblockt“; PaTiChronicle erscheint in der
+- [x] PT-CHRON-001 Login ohne Lua-Fehler und ohne Fenster „wurde geblockt“; PaTiChronicle erscheint in der
   AddOn-Liste mit Beschreibung („Jeder Run erzählt eine Geschichte …“); der alte Ordner `PaTiCompetition` ist weg
-- [ ] PT-CHRON-002 `/reload` ohne Lua-Fehler; `/pchron` und `/patichronicle` antworten, `/pchron version` zeigt 0.2.0
-- [ ] PT-CHRON-003 Der alte Befehl `/pcomp` funktioniert noch genauso wie `/pchron`
+  - ✅ VERIFIED 2026-10-20 (Owner, Abhak-Liste)
+- [x] PT-CHRON-002 `/reload` ohne Lua-Fehler; `/pchron` und `/patichronicle` antworten, `/pchron version` zeigt 0.2.0
+  - ✅ VERIFIED 2026-10-20 (Owner, Abhak-Liste)
+- [x] PT-CHRON-003 Der alte Befehl `/pcomp` funktioniert noch genauso wie `/pchron`
+  - ✅ VERIFIED 2026-10-20 (Owner, Abhak-Liste)
 - [ ] PT-CHRON-005 Noch kein Run: PaTiSuite „alle zeigen“ und `/pchron` öffnen das Fenster mit „Noch kein Run …“;
   keine Meldung „Chronicle: im Kampf nicht möglich“, keine Chat-Zeile; der Knopf „Testmodus: Beispiel-Run ansehen“
   zeigt den Beispiel-Run (TEST-Abzeichen), ••• → Testmodus wieder aus → zurück zum Hinweis
-- [ ] PT-CHRON-004 Übernommene Daten: Farbschema, Größe und Sprache wie vorher bei PaTiCompetition
+- [x] PT-CHRON-004 Übernommene Daten: Farbschema, Größe und Sprache wie vorher bei PaTiCompetition
+  - ✅ VERIFIED 2026-10-20 (Owner, Abhak-Liste)
 
 ## API-Prüfung (Probe, Tests T1–T7)
 
@@ -40,7 +44,8 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
   Gruppenmitgliedern …“ – Zahlen melden
 - [ ] PT-CHRON-013 (T3) Nach einem Tod in der Gruppe `/pchron probe`: „Todeszustand: lesbar … · geheim …“ – melden
 - [ ] PT-CHRON-014 (T4) „Kämpfe in Dungeons gesehen“ steigt mit jedem Kampf im Dungeon
-- [ ] PT-CHRON-015 (T5) Die Run-Uhr zeigt den richtigen Dungeon-Namen
+- [x] PT-CHRON-015 (T5) Die Run-Uhr zeigt den richtigen Dungeon-Namen
+  - ✅ VERIFIED 2026-10-20 (Owner, Abhak-Liste)
 - [ ] PT-CHRON-016 (T7) Ohne Rollenwahl: Reiter „Meine Leistung“ zeigt deine Rolle (oder „Keine Rolle“);
   Einstellung „Meine Rolle“ ändert sie für den nächsten Run
 
@@ -54,7 +59,8 @@ RETIRED (Legacy) und werden nie wiederverwendet; kein früheres `[x]` gab es zu 
 
 ## Run
 
-- [ ] PT-CHRON-020 Dungeon betreten: Uhr-Zeile „<Dungeon> bereit …“; erster Kampf: Chat „Run gestartet“, Uhr läuft
+- [x] PT-CHRON-020 Dungeon betreten: Uhr-Zeile „<Dungeon> bereit …“; erster Kampf: Chat „Run gestartet“, Uhr läuft
+  - ✅ VERIFIED 2026-10-20 (Owner, Abhak-Liste)
 - [ ] PT-CHRON-021 Sterben und als Geist zurücklaufen: Run läuft weiter; im Verlauf steht der Tod; „Lückenlos: ja“
 - [ ] PT-CHRON-022 `/reload` im Run: Run läuft weiter, im Verlauf unten „Lückenlos: nein“
 - [ ] PT-CHRON-023 Nach dem Endboss ••• oder Rechtsklick auf die Uhr → „Run beenden – Endboss besiegt“: Chat „Run
