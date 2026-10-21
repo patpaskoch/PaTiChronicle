@@ -5,8 +5,8 @@
 -- Each session goes into the run as one snapshot (Run.MeterSession). A session that is unreadable now is skipped
 -- and read again at the next look, as long as WoW still lists it.
 -- Owner run 2026-10-20 (reported 2026-10-21): every session read by its ID came back without a single member,
--- while the probe's read by type (Current) right after combat saw the players. So the newest session is also read by type after each fight,
--- and run.meter.diag keeps what each way returned (for the next look into the SavedVariables).
+-- while the probe's read by type (Current) right after combat saw the players. So the newest session is also
+-- read by type after each fight, and run.meter.diag keeps what each way returned (for the SavedVariables).
 local _, ns = ...
 local Run = ns.Run
 local Meter = {}
