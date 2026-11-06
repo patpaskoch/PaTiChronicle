@@ -1,5 +1,7 @@
 # PaTiChronicle
 
+## What is PaTiChronicle?
+
 **Every run tells a story.** A chronicle of your dungeon runs for World of Warcraft: Forever (Interface 16001):
 a run clock, a run report after every dungeon, best times, your run history and achievements for teamplay,
 survival and personal bests. We play together against our own earlier runs — not against each other.
@@ -11,7 +13,33 @@ survival and personal bests. We play together against our own earlier runs — n
 > Status: 0.2.0, not yet tested in game. Which events this client really sends is checked by the probe
 > (`/pchron probe`); achievements that need data the client does not deliver are never given.
 
+## Features
+
+- **Run report:** Overview, group results, your contribution and timeline.
+- **Run clock:** track dungeon time and personal bests.
+- **Achievements and history:** progress tracked from available in-game data.
+
+## Installation
+
+![PaTiChronicle – three-step installation guide](assets/installation_en.svg)
+
+1. 📥 **Download** – Open [GitHub Releases](https://github.com/patpaskoch/PaTiChronicle/releases) and download the `PaTiChronicle-<version>.zip` file under **Assets** (not **Source code (zip)**).
+2. 📂 **Extract & Copy** – Right-click the ZIP, select **Extract All**, then copy the extracted `PaTiChronicle` folder into the WoW Forever client's `Interface/AddOns/` folder. No renaming is needed.
+3. ☑️ **Enable in Game** – Start WoW, open the **AddOns** menu at character selection, tick **PaTiChronicle**, and click **OK**.
+
+## Getting Started
+
+- Use `/pchron` to open the run report.
+- Use `/pchron test` for a sample run and `/pchron settings` for preferences.
+
+## Settings
+
+••• → Settings (or `/pchron settings`), like the other PaTi addons: language, scale, my role, show the run clock,
+open the report at the end, lock window, theme (WoForever by default), panel opacity, the test mode switch and
+Restore Defaults (keeps the position, runs, best times and the probe).
+
 ## The run report
+
 Opens when a run ends (or with `/pchron`). A calm results screen with four tabs — first the shared success, then
 the group, then your part, then the details:
 - **Overview** — completed, the dungeon, the run time large, a new best time, the group (portrait, name in class
@@ -28,6 +56,7 @@ the group, then your part, then the details:
   yours.
 
 ## Run rules
+
 - **Start:** the first fight inside a 5-player dungeon.
 - **Continues** through deaths, wipes, running back as a ghost, `/reload` and disconnects.
 - **Completed:** your click "End run – end boss defeated" (••• menu, the clock's right-click menu, `/pchron end`), or
@@ -40,6 +69,7 @@ the group, then your part, then the details:
   "nothing happened" (no death, no aggro) need a run without gaps.
 
 ## Achievements
+
 Only for data the client delivers readably; never for missing or incomplete data (then "not checkable" with the
 reason in the tooltip). Always positive; nothing is put on another player. The rule of each one is in its tooltip.
 
@@ -59,12 +89,14 @@ An **aggro moment**: an enemy attacks a non-tank for at least 3 seconds without 
 Your role: the group role, or "My role" in the settings. Without a known tank the others' moments are not counted.
 
 ## Opening the report
+
 - **Minimap button** (book): left click shows / hides the report, right click opens the menu, drag moves it. Off in the
   settings or with `/pchron minimap`.
 - **Key binding:** WoW key bindings → PaTiChronicle → "Run report on / off" (PaTiChronicle never binds a key itself).
 - `/pchron`, the run clock (left click), or PaTiSuite.
 
 ## Run clock
+
 One quiet line inside a dungeon: dungeon, run time, best time. Right click: end run, abort, open the report, hide.
 Drag to move. Switch it off in the settings or with `/pchron hud`.
 
@@ -74,26 +106,15 @@ This addon is part of the **PaTiSuite** — a collection of small addons for Wor
 Each one is installed on its own and works on its own; none of them is needed by another.
 Overview of all addons: [PaTiAdmin](https://github.com/patpaskoch/PaTiAdmin).
 
-## Installation
-
-![PaTiChronicle – three-step installation guide](assets/installation_en.svg)
-
-1. 📥 **Download** – Open [GitHub Releases](https://github.com/patpaskoch/PaTiChronicle/releases) and download the `PaTiChronicle-<version>.zip` file under **Assets** (not **Source code (zip)**).
-2. 📂 **Extract & Copy** – Right-click the ZIP, select **Extract All**, then copy the extracted `PaTiChronicle` folder into the WoW Forever client's `Interface/AddOns/` folder. No renaming is needed.
-3. ☑️ **Enable in Game** – Start WoW, open the **AddOns** menu at character selection, tick **PaTiChronicle**, and click **OK**.
-
 ## Commands
+
 `/pchron` or `/patichronicle` (report on / off) — `show` · `hide` · `test` (example run on / off) · `lock` ·
 `unlock` · `reset` (window and clock back to their default position) · `settings` · `end` (end the run: end boss
 defeated) · `abort` · `hud` (clock on / off) · `probe` (what this client delivers) · `clear` (clear the probe) ·
 `version`
 
-## Settings
-••• → Settings (or `/pchron settings`), like the other PaTi addons: language, scale, my role, show the run clock,
-open the report at the end, lock window, theme (WoForever by default), panel opacity, the test mode switch and
-Restore Defaults (keeps the position, runs, best times and the probe).
-
 ## Known limitations
+
 - The combat log is reserved for the Blizzard UI in this client: no damage, healing, interrupts or killing blows.
   Contribution comes from `C_DamageMeter` instead: its values are secret during a fight, so it is read after each fight
   (a run that ends in combat gets its last fight after combat). Runs from before 0.2.0 show "n/a" there.
@@ -106,4 +127,5 @@ Restore Defaults (keeps the position, runs, best times and the probe).
 Architecture, tests and engineering rules of the suite: [PaTiAdmin](https://github.com/patpaskoch/PaTiAdmin). PaTiAdmin is not a WoW addon — players do not install it. The shared UI code (PaTiShared) is already embedded in this addon's `Shared/` folder; there is nothing extra to install.
 
 ## License
+
 MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Patrick Koch.
