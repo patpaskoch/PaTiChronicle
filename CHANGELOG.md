@@ -20,7 +20,12 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 - Group result: always the portrait, no 3D character (owner 2026-10-19: the 3D figure came and went).
 
 
-## [Unreleased] — 0.2.0 PaTiChronicle
+## [Unreleased]
+
+## [0.2.0-beta.1] - 2026-11-06
+
+**Installation-test pre-release:** Not yet validated in the live WoW Forever client. Intended for the owner's fresh-install test only; report bugs on GitHub.
+
 ### Changed
 - Renamed from PaTiCompetition to **PaTiChronicle** — "Every run tells a story" (owner decision 2026-10-19): a
   chronicle of dungeon runs instead of a competition between players. GitHub repo renamed (history kept). Commands
