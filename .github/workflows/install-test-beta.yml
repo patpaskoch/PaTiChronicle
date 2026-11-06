@@ -23,11 +23,10 @@ jobs:
           repository: patpaskoch/PaTiAdmin
           path: PaTiAdmin
 
-      - uses: leafo/gh-actions-lua@v10
-        with:
-          luaVersion: "5.1"
-      - uses: leafo/gh-actions-luarocks@v4
-      - run: luarocks install luacheck
+      - name: Install Lua 5.1 and Luacheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y lua5.1 lua-check
 
       - name: Validate source and package
         run: bash PaTiAdmin/tools/check.sh "PaTiAddons/${{ github.event.repository.name }}"
@@ -52,7 +51,7 @@ jobs:
       - name: Extract beta notes
         env:
           ADDON: ${{ github.event.repository.name }}
-        run: (cd "PaTiAddons/$ADDON" && lua ../../PaTiAdmin/tools/lua/run.lua notes "${{ steps.version.outputs.version }}") > notes.md
+        run: (cd "PaTiAddons/$ADDON" && lua5.1 ../../PaTiAdmin/tools/lua/run.lua notes "${{ steps.version.outputs.version }}") > notes.md
 
       - name: Publish unverified installation-test pre-release
         env:
