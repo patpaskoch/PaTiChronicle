@@ -75,9 +75,12 @@ Each one is installed on its own and works on its own; none of them is needed by
 Overview of all addons: [PaTiAdmin](https://github.com/patpaskoch/PaTiAdmin).
 
 ## Installation
-1. Download the release zip (`PaTiChronicle-<version>.zip`).
-2. Unpack it and copy the folder `PaTiChronicle` into `World of Warcraft/<client>/Interface/AddOns/`.
-3. Start WoW and enable PaTiChronicle in the AddOns list.
+
+![PaTiChronicle – three-step installation guide](assets/installation_en.svg)
+
+1. 📥 **Download** – Open [GitHub Releases](https://github.com/patpaskoch/PaTiChronicle/releases) and download the `PaTiChronicle-<version>.zip` file under **Assets** (not **Source code (zip)**).
+2. 📂 **Extract & Copy** – Right-click the ZIP, select **Extract All**, then copy the extracted `PaTiChronicle` folder into the WoW Forever client's `Interface/AddOns/` folder. No renaming is needed.
+3. ☑️ **Enable in Game** – Start WoW, open the **AddOns** menu at character selection, tick **PaTiChronicle**, and click **OK**.
 
 ## Commands
 `/pchron` or `/patichronicle` (report on / off) — `show` · `hide` · `test` (example run on / off) · `lock` ·
