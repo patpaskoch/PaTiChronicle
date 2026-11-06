@@ -1,25 +1,24 @@
 # PaTiChronicle
 
+## Install
+
+**📥 [Download PaTiChronicle Beta](https://github.com/patpaskoch/PaTiChronicle/releases/download/v0.2.0-beta.1/PaTiChronicle-0.2.0-beta.1.zip)** · [Installation guide](#installation)
+
+*Installation-test preview — not yet a stable release.*
+
 ## What is PaTiChronicle?
 
-> **Installation-test beta available:** [Download the current ZIP from Releases](https://github.com/patpaskoch/PaTiChronicle/releases). This is an unverified preview for testing the installation, not a stable release.
+**Every run tells a story.**
 
-**Every run tells a story.** A chronicle of your dungeon runs for World of Warcraft: Forever (Interface 16001):
-a run clock, a run report after every dungeon, best times, your run history and achievements for teamplay,
-survival and personal bests. We play together against our own earlier runs — not against each other.
-
-> Formerly **PaTiCompetition** (renamed 2026-10-19). The old `/pcomp` command still works until 0.3.0. Saved data:
-> WoW keeps it per addon folder, so copy `WTF/…/SavedVariables/PaTiCompetition.lua` to `PaTiChronicle.lua` once
-> (WoW closed) and rename `PaTiCompetitionDB` inside to `PaTiChronicleDB`; otherwise PaTiChronicle starts fresh.
-
-> Status: 0.2.0, not yet tested in game. Which events this client really sends is checked by the probe
-> (`/pchron probe`); achievements that need data the client does not deliver are never given.
+The boss is down, but the memories don't have to end there. PaTiChronicle turns your dungeon runs into a story of progress, teamwork and personal milestones. Look back at your adventures, celebrate new best times and see how far your group has come — **together, not against each other.**
 
 ## Features
 
-- **Run report:** Overview, group results, your contribution and timeline.
-- **Run clock:** track dungeon time and personal bests.
-- **Achievements and history:** progress tracked from available in-game data.
+- **Remember every run:** Review dungeon results and your run history.
+- **Chase your own best:** Track run times and personal records.
+- **Celebrate teamwork:** Unlock achievements when the client provides the needed data.
+- **See the full picture:** Explore the overview, group results and available contribution details.
+- **Stay in the moment:** A compact run clock during dungeon adventures.
 
 ## Installation
 
@@ -39,6 +38,17 @@ survival and personal bests. We play together against our own earlier runs — n
 ••• → Settings (or `/pchron settings`), like the other PaTi addons: language, scale, my role, show the run clock,
 open the report at the end, lock window, theme (WoForever by default), panel opacity, the test mode switch and
 Restore Defaults (keeps the position, runs, best times and the probe).
+
+## Important notes
+
+> **Installation-test beta available:** [Download the current ZIP from Releases](https://github.com/patpaskoch/PaTiChronicle/releases). This is an unverified preview for testing the installation, not a stable release.
+
+> Formerly **PaTiCompetition** (renamed 2026-10-19). The old `/pcomp` command still works until 0.3.0. Saved data:
+> WoW keeps it per addon folder, so copy `WTF/…/SavedVariables/PaTiCompetition.lua` to `PaTiChronicle.lua` once
+> (WoW closed) and rename `PaTiCompetitionDB` inside to `PaTiChronicleDB`; otherwise PaTiChronicle starts fresh.
+
+> Status: 0.2.0, not yet tested in game. Which events this client really sends is checked by the probe
+> (`/pchron probe`); achievements that need data the client does not deliver are never given.
 
 ## The run report
 
