@@ -2,6 +2,8 @@
 
 ## What is PaTiChronicle?
 
+> **Installation-test beta available:** [Download the current ZIP from Releases](https://github.com/patpaskoch/PaTiChronicle/releases). This is an unverified preview for testing the installation, not a stable release.
+
 **Every run tells a story.** A chronicle of your dungeon runs for World of Warcraft: Forever (Interface 16001):
 a run clock, a run report after every dungeon, best times, your run history and achievements for teamplay,
 survival and personal bests. We play together against our own earlier runs — not against each other.
