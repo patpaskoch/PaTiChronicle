@@ -3,7 +3,7 @@
 ## Notes: Every run tells a story: dungeon run chronicle with run report, best times and achievements
 ## Notes-deDE: Jeder Run erzählt eine Geschichte: Dungeon-Chronik mit Run-Bericht, Bestzeiten und Erfolgen
 ## Author: PaTi
-## Version: 0.2.0
+## Version: 0.2.0-beta.1
 ## SavedVariablesPerCharacter: PaTiChronicleDB
 
 Shared\Shared.xml
