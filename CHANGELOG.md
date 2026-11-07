@@ -21,6 +21,10 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
 
 
 ## [Unreleased] — 0.2.0 PaTiChronicle
+### Added
+- Locking or unlocking the window (••• menu, slash command or settings) now answers with a chat line,
+  e.g. "Window locked." (PaTiShared, owner 2026-11-07).
+
 ### Changed
 - Renamed from PaTiCompetition to **PaTiChronicle** — "Every run tells a story" (owner decision 2026-10-19): a
   chronicle of dungeon runs instead of a competition between players. GitHub repo renamed (history kept). Commands
