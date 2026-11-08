@@ -208,6 +208,9 @@ describe("Logic.Migrate robustness (audit 2026-11-08)", function()
         assert.same({}, db.probe.events)
         assert.same({}, db.probe.encounters)
         assert.equal(0, db.probe.fights)
+        local partial = { events = {}, encounters = {}, fights = 1, deaths = { readable = 0, secret = 0, seen = 0 },
+            threat = { readable = 0, secret = 0 } } -- no `party` counter
+        assert.equal(0, ns.Logic.Migrate({ schema = ns.Logic.SCHEMA, probe = partial }).probe.threat.party)
         local full = ns.Logic.NewProbe()
         full.fights = 7
         assert.equal(7, ns.Logic.Migrate({ schema = ns.Logic.SCHEMA, probe = full }).probe.fights)

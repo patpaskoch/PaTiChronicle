@@ -33,6 +33,15 @@ end
 
 local function isList(value) return type(value) == "table" end
 
+-- True when every named field of the table is a number (the probe counters are incremented later).
+local function hasNumbers(entry, keys)
+    if not isList(entry) then return false end
+    for _, key in ipairs(keys) do
+        if type(entry[key]) ~= "number" then return false end
+    end
+    return true
+end
+
 -- SavedVariables: { schema, settings (DEFAULTS), position, hud (its position), probe, run, report, runs, bests,
 -- groupBests, teams, streaks, endBosses, groupCategory }. Runs recorded before schema 3 have no per-member values
 -- (they show "n/a"; Run.VERSION). Schema 1 (PaTiCompetition 0.1.0, copied over once by hand): settings
@@ -43,8 +52,9 @@ function Logic.Migrate(db)
     local schema = tonumber(db.schema) or 1 -- a text or broken schema must not make `schema < 2` fail
     -- An incomplete probe (a part missing or broken) would fail in RecordRead/RecordEncounter: renew it.
     local probe = db.probe
-    local oldProbe = schema < 2 or not isList(probe) or not isList(probe.threat) or not isList(probe.deaths)
-        or not isList(probe.events) or not isList(probe.encounters) or type(probe.fights) ~= "number"
+    local oldProbe = schema < 2 or not isList(probe) or not isList(probe.events)
+        or not hasNumbers(probe.threat, { "readable", "secret", "party" })
+        or not hasNumbers(probe.deaths, { "readable", "secret", "seen" }) or not isList(probe.encounters) or type(probe.fights) ~= "number"
     if oldProbe then db.probe = Logic.NewProbe() end
     -- Schema 3 (redesign 2026-10-19): the old default opacity 0.75 let the world shine through; it becomes 1 once.
     -- Any other saved value was the player's own choice and stays.
