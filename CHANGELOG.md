@@ -9,6 +9,7 @@ Format: `## [Unreleased]` / `## [x.y.z] - YYYY-MM-DD` with Added, Changed, Fixed
   Test mode has example values.
 
 ### Fixed
+- Hardening: a schema saved as text or an incomplete probe in SavedVariables no longer breaks the login; the death check asks the other members only when the reported one is dead (audit 2026-11-08).
 - Contribution stayed empty after a real run (owner 2026-10-21): every fight read by its session ID came back
   without a single member. Right after each fight the newest fight is now also read by type (Current), the way the
   probe saw the players; an empty read never replaces a stored one, and a run with only empty reads shows "n/a"

@@ -40,8 +40,11 @@ local function isList(value) return type(value) == "table" end
 -- replaced.
 function Logic.Migrate(db)
     if type(db) ~= "table" then db = {} end
-    local schema = db.schema or 1
-    local oldProbe = schema < 2 or not isList(db.probe) or not isList(db.probe.threat)
+    local schema = tonumber(db.schema) or 1 -- a text or broken schema must not make `schema < 2` fail
+    -- An incomplete probe (a part missing or broken) would fail in RecordRead/RecordEncounter: renew it.
+    local probe = db.probe
+    local oldProbe = schema < 2 or not isList(probe) or not isList(probe.threat) or not isList(probe.deaths)
+        or not isList(probe.events) or not isList(probe.encounters) or type(probe.fights) ~= "number"
     if oldProbe then db.probe = Logic.NewProbe() end
     -- Schema 3 (redesign 2026-10-19): the old default opacity 0.75 let the world shine through; it becomes 1 once.
     -- Any other saved value was the player's own choice and stays.
