@@ -254,10 +254,13 @@ local function deathCheck(unit)
     local dead = UnitIsDeadOrGhost(unit)
     Logic.RecordRead(DB.probe, "deaths", isSecret(dead))
     if isSecret(dead) then Run.DeathState(run, name, nil, false, time()); return end
-    local allDead = true
-    for other in pairs(memberUnits) do
-        local value = UnitIsDeadOrGhost(other)
-        if isSecret(value) or not value then allDead = false end
+    -- Only a dead member can complete a wipe: ask the others only then (one call per member less on each event).
+    local allDead = dead and true or false
+    if allDead then
+        for other in pairs(memberUnits) do
+            local value = UnitIsDeadOrGhost(other)
+            if isSecret(value) or not value then allDead = false; break end
+        end
     end
     Run.DeathState(run, name, dead and true or false, allDead, time())
 end
